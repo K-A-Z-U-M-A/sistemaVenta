@@ -1,0 +1,28 @@
+================================================================
+OPCIÓN RECOMENDADA: BACKUP AUTOMÁTICO (MÉTODO FÁCIL Y GRATIS)
+================================================================
+
+No necesitas pagar nada ni configurar claves complicadas.
+El sistema ya está guardando tus copias de seguridad en esta carpeta de tu computadora:
+
+C:\Proyects\Sistema Abarrotes\sistemaAbarrotes\storage\app\backups\
+
+Para subirlas a la nube automáticamente, solo sigue estos 3 pasos:
+
+1. Descarga e instala "Google Drive para ordenadores" (Es oficial y gratis).
+   Link: https://www.google.com/drive/download/
+
+2. Abre Google Drive en tu PC e inicia sesión con tu cuenta (la de 15GB gratis).
+
+3. Ve a "Preferencias" > "Mi PC" > "Añadir carpeta".
+   - Selecciona la carpeta de arriba:
+     C:\Proyects\Sistema Abarrotes\sistemaAbarrotes\storage\app\backups\
+   - Dale a "Sincronizar con Google Drive".
+
+¡LISTO!
+Cada vez que cierres caja, el sistema crea el archivo en esa carpeta, y Google Drive detectará el archivo nuevo y lo subirá a tu nube automáticamente.
+
+Ventajas:
+- 100% Gratis.
+- No tocas código ni configuraciones raras.
+- Si tu PC se rompe, los archivos están en tu Google Drive.

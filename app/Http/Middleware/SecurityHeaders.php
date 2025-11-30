@@ -36,7 +36,7 @@ class SecurityHeaders
 
         // Content Security Policy (CSP) - Básico
         // Esto previene la carga de scripts no autorizados
-        // $response->headers->set('Content-Security-Policy', "default-src 'self' https:; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:;");
+        $response->headers->set('Content-Security-Policy', "default-src 'self' https:; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:;");
 
         return $response;
     }

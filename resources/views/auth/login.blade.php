@@ -369,9 +369,17 @@
         const loginForm = document.getElementById('loginForm');
         const loginBtn = document.getElementById('loginBtn');
 
-        loginForm.addEventListener('submit', function() {
+        loginForm.addEventListener('submit', function(e) {
+            // Prevent double submission
+            if (loginBtn.classList.contains('loading')) {
+                e.preventDefault();
+                return;
+            }
+            
             loginBtn.classList.add('loading');
-            loginBtn.innerHTML = '<span>Iniciando sesión...</span>';
+            // Keep the width to prevent layout shift
+            loginBtn.style.width = loginBtn.offsetWidth + 'px';
+            loginBtn.innerHTML = ''; // Clear text to show spinner clearly
         });
 
         // Auto-dismiss alerts after 5 seconds

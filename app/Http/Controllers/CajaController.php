@@ -7,6 +7,8 @@ use App\Models\Venta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class CajaController extends Controller
 {
@@ -100,6 +102,51 @@ class CajaController extends Controller
             'fecha_cierre' => Carbon::now(),
             'estado' => 'cerrada'
         ]);
+
+        // --- INICIO BACKUP AUTOMATICO ---
+        try {
+            $filename = 'backup-' . Carbon::now()->format('Y-m-d-H-i-s') . '.sql';
+            $path = storage_path('app/backups/' . $filename);
+            
+            // Asegurar que existe el directorio
+            if (!file_exists(dirname($path))) {
+                mkdir(dirname($path), 0755, true);
+            }
+
+            // Configuración DB
+            $dbHost = config('database.connections.pgsql.host');
+            $dbPort = config('database.connections.pgsql.port');
+            $dbName = config('database.connections.pgsql.database');
+            $dbUser = config('database.connections.pgsql.username');
+            $dbPass = config('database.connections.pgsql.password');
+
+            // Comando pg_dump (Ruta absoluta para Windows)
+            $pgDumpPath = '"C:\\Program Files\\PostgreSQL\\17\\bin\\pg_dump.exe"';
+            
+            // Construir comando
+            $command = "set PGPASSWORD={$dbPass} && {$pgDumpPath} -h {$dbHost} -p {$dbPort} -U {$dbUser} -F p -f \"{$path}\" {$dbName}";
+            
+            exec($command, $output, $returnVar);
+
+            if ($returnVar === 0) {
+                // Subir a Drive si está configurado
+                if (config('filesystems.disks.google.clientId')) {
+                    try {
+                        Storage::disk('google')->put('Backups/' . $filename, file_get_contents($path));
+                        Log::info("Backup subido a Drive: " . $filename);
+                    } catch (\Exception $e) {
+                        Log::error("Error subiendo a Drive: " . $e->getMessage());
+                        $request->session()->flash('warning', 'Caja cerrada, pero falló la subida a Drive. El backup local está seguro.');
+                    }
+                }
+            } else {
+                Log::error("Error generando backup local. Código: " . $returnVar);
+            }
+
+        } catch (\Exception $e) {
+            Log::error("Error en proceso de backup: " . $e->getMessage());
+        }
+        // --- FIN BACKUP AUTOMATICO ---
 
         return back()->with('success', 'Caja cerrada exitosamente');
     }

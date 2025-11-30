@@ -1,0 +1,49 @@
+================================================================
+GUIA PARA ACTIVAR BACKUP AUTOMATICO EN GOOGLE DRIVE
+================================================================
+
+El sistema ya está configurado para generar un backup LOCAL (en tu computadora) cada vez que cierras caja.
+Para que estos backups se suban automáticamente a Google Drive, necesitas obtener unas credenciales de Google.
+
+PASO 1: Crear Credenciales en Google Cloud Console
+--------------------------------------------------
+1. Ve a: https://console.cloud.google.com/
+2. Crea un nuevo proyecto (ej. "Sistema Abarrotes Backup").
+3. En el menú, ve a "APIs y Servicios" > "Biblioteca".
+4. Busca "Google Drive API" y habilítala.
+5. Ve a "APIs y Servicios" > "Credenciales".
+6. Dale a "Crear Credenciales" > "ID de cliente de OAuth".
+7. Tipo de aplicación: "App de escritorio" (o Web si sabes configurar la redirección, pero Escritorio es más fácil para obtener el token una vez).
+8. Descarga el archivo JSON o copia el "ID de cliente" y "Secreto de cliente".
+
+PASO 2: Obtener el Refresh Token
+--------------------------------
+Este paso es un poco técnico. Necesitas autorizar a tu aplicación una vez para obtener el "Refresh Token".
+Puedes usar esta herramienta online de Google para generarlo (OAuth 2.0 Playground):
+https://developers.google.com/oauthplayground/
+
+1. En "Select & authorize APIs", busca "Drive API v3" y selecciona "https://www.googleapis.com/auth/drive.file".
+2. Dale a "Authorize APIs".
+3. Inicia sesión con tu cuenta de Google donde quieres los backups.
+4. Dale a "Exchange authorization code for tokens".
+5. Copia el "Refresh Token".
+
+PASO 3: Configurar el Sistema
+-----------------------------
+Abre el archivo `.env` en la carpeta de tu proyecto y agrega estas líneas al final:
+
+GOOGLE_DRIVE_CLIENT_ID=tu_id_de_cliente_aqui
+GOOGLE_DRIVE_CLIENT_SECRET=tu_secreto_aqui
+GOOGLE_DRIVE_REFRESH_TOKEN=tu_refresh_token_aqui
+GOOGLE_DRIVE_FOLDER=
+
+(Deja GOOGLE_DRIVE_FOLDER vacío para subir a la raíz, o pon el ID de una carpeta si prefieres).
+
+================================================================
+NOTA IMPORTANTE:
+Si esto te parece muy complicado, NO TE PREOCUPES.
+El sistema SIEMPRE guardará una copia de seguridad en tu computadora en:
+c:\Proyects\Sistema Abarrotes\sistemaAbarrotes\storage\app\backups\
+
+Puedes instalar "Google Drive para Escritorio" y simplemente arrastrar esos archivos manualmente si lo prefieres.
+================================================================
