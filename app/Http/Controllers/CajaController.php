@@ -174,8 +174,21 @@ class CajaController extends Controller
      */
     public function balance(Request $request)
     {
-        $fechaInicio = $request->get('fecha_inicio', Carbon::now()->startOfMonth()->format('Y-m-d'));
-        $fechaFin = $request->get('fecha_fin', Carbon::now()->format('Y-m-d'));
+        // Filtros de fecha - Por defecto: TODOS los datos (sin filtro)
+        if ($request->has('fecha_inicio') && $request->has('fecha_fin')) {
+            $fechaInicio = $request->get('fecha_inicio');
+            $fechaFin = $request->get('fecha_fin');
+            $usarFiltro = true;
+        } else {
+            // Sin filtro: obtener primera y última caja
+            $primeraCaja = Caja::orderBy('fecha_apertura', 'asc')->first();
+            $ultimaCaja = Caja::orderBy('fecha_apertura', 'desc')->first();
+            
+            // Parsear correctamente las fechas
+            $fechaInicio = $primeraCaja ? Carbon::parse($primeraCaja->fecha_apertura)->format('Y-m-d') : Carbon::now()->format('Y-m-d');
+            $fechaFin = $ultimaCaja ? Carbon::parse($ultimaCaja->fecha_cierre ?? $ultimaCaja->fecha_apertura)->format('Y-m-d') : Carbon::now()->format('Y-m-d');
+            $usarFiltro = false;
+        }
 
         $cajas = Caja::whereBetween('fecha_apertura', [$fechaInicio, $fechaFin])
             ->with('user')

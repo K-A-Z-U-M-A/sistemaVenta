@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso al Sistema - QR Code</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 450px;
+            width: 100%;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .qr-wrapper {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        #qrcode {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .ip-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin: 1.5rem 0;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            letter-spacing: 1px;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .info-text {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .loading {
+            color: #667eea;
+            font-size: 1rem;
+            padding: 30px;
+        }
+        
+        .error {
+            color: #dc3545;
+            padding: 20px;
+            background: #f8d7da;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛒 Sistema de Abarrotes</h1>
+        <p class="subtitle">Acceso Rápido al Sistema</p>
+        
+        <div class="qr-wrapper">
+            <div id="qrcode">
+                <div class="loading">⏳ Generando código QR...</div>
+            </div>
+        </div>
+        
+        <div class="ip-badge" id="url-display">Detectando IP...</div>
+        
+        <a href="#" class="btn btn-primary" id="open-link">📱 ABRIR EN ESTE DISPOSITIVO</a>
+        
+        <p class="info-text">
+            ✨ Escanea el código QR con tu celular para acceder desde cualquier dispositivo en la red local
+        </p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script>
+        // Función para detectar la IP local
+        async function detectarIP() {
+            try {
+                // Intentar obtener la IP desde el parámetro URL
+                const urlParams = new URLSearchParams(window.location.search);
+                let ip = urlParams.get('ip');
+                
+                if (!ip) {
+                    // Si no hay parámetro, usar localhost
+                    ip = window.location.hostname || 'localhost';
+                }
+                
+                return ip;
+            } catch (error) {
+                console.error('Error detectando IP:', error);
+                return 'localhost';
+            }
+        }
+
+        // Función para generar el QR
+        async function generarQR() {
+            try {
+                const ip = await detectarIP();
+                const url = `http://${ip}:8000`;
+                
+                // Actualizar el badge de URL
+                document.getElementById('url-display').textContent = url;
+                
+                // Actualizar el enlace del botón
+                document.getElementById('open-link').href = url;
+                
+                // Limpiar el contenedor del QR
+                const qrContainer = document.getElementById('qrcode');
+                qrContainer.innerHTML = '';
+                
+                // Generar el código QR
+                new QRCode(qrContainer, {
+                    text: url,
+                    width: 200,
+                    height: 200,
+                    colorDark: '#000000',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                
+                console.log('QR generado exitosamente para:', url);
+            } catch (error) {
+                console.error('Error al generar QR:', error);
+                document.getElementById('qrcode').innerHTML = 
+                    '<div class="error">❌ Error al generar el código QR. Por favor, recarga la página.</div>';
+            }
+        }
+
+        // Generar el QR cuando la página cargue
+        window.addEventListener('load', generarQR);
+    </script>
+</body>
+</html>

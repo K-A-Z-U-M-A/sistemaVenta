@@ -13,9 +13,22 @@ class EstadisticaController extends Controller
 {
     public function index(Request $request)
     {
-        // Filtros de fecha - por defecto últimos 12 meses
-        $fechaInicio = $request->get('fecha_inicio', Carbon::now()->subMonths(12)->format('Y-m-d'));
-        $fechaFin = $request->get('fecha_fin', Carbon::now()->format('Y-m-d'));
+        // Filtros de fecha - Por defecto: TODOS los datos (sin filtro)
+        // Solo filtra si el usuario envía fechas específicas
+        if ($request->has('fecha_inicio') && $request->has('fecha_fin')) {
+            $fechaInicio = $request->get('fecha_inicio');
+            $fechaFin = $request->get('fecha_fin');
+            $usarFiltro = true;
+        } else {
+            // Sin filtro: obtener la primera y última venta para mostrar el rango completo
+            $primeraVenta = Venta::where('estado', 1)->orderBy('fecha_hora', 'asc')->first();
+            $ultimaVenta = Venta::where('estado', 1)->orderBy('fecha_hora', 'desc')->first();
+            
+            // Obtener las fechas directamente sin formatear (ya vienen como strings de la DB)
+            $fechaInicio = $primeraVenta ? Carbon::parse($primeraVenta->fecha_hora)->format('Y-m-d') : Carbon::now()->format('Y-m-d');
+            $fechaFin = $ultimaVenta ? Carbon::parse($ultimaVenta->fecha_hora)->format('Y-m-d') : Carbon::now()->format('Y-m-d');
+            $usarFiltro = false;
+        }
 
         // Ventas del período
         $ventasPeriodo = Venta::whereBetween('fecha_hora', [$fechaInicio, $fechaFin])

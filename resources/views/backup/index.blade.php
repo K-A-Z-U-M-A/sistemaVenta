@@ -2,8 +2,9 @@
 
 @section('title','Backups')
 
-@push('css')
+@push('js')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ asset('js/backups.js') }}"></script>
 @endpush
 
 @section('content')
@@ -28,7 +29,7 @@
             </div>
 
             @can('crear-backup')
-            <form action="{{ route('backup.create') }}" method="POST" class="mb-3">
+            <form action="{{ route('backup.create') }}" method="POST" class="mb-3" id="createBackupForm">
                 @csrf
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-plus me-2"></i> Generar Nuevo Backup
@@ -59,33 +60,14 @@
                                     </a>
                                     
                                     @can('eliminar-backup')
-                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-{{ str_replace('.', '-', $backup['file_name']) }}" title="Eliminar">
+                                    <button type="button" 
+                                            class="btn btn-danger btn-sm delete-backup-btn" 
+                                            data-filename="{{ $backup['file_name'] }}"
+                                            data-url="{{ route('backup.destroy', $backup['file_name']) }}"
+                                            title="Eliminar">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                     @endcan
-                                </div>
-
-                                <!-- Modal Eliminar -->
-                                <div class="modal fade" id="deleteModal-{{ str_replace('.', '-', $backup['file_name']) }}" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header bg-danger text-white">
-                                                <h5 class="modal-title">Confirmar Eliminación</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                ¿Estás seguro de eliminar el backup <strong>{{ $backup['file_name'] }}</strong>?
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                                <form action="{{ route('backup.destroy', $backup['file_name']) }}" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </td>
                         </tr>

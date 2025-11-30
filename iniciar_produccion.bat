@@ -1,38 +1,44 @@
 @echo off
-setlocal
+setlocal enabledelayedexpansion
 echo ========================================
-echo   Sistema de Abarrotes - MODO PRODUCCION
+echo   Sistema de Abarrotes
 echo ========================================
 echo.
 
-REM 1. Compilar Assets
-echo [1/3] Generando archivos de estilo...
+REM Detener servidores anteriores
+echo [1/4] Deteniendo servidores anteriores...
+taskkill /F /IM php.exe >nul 2>&1
+timeout /t 1 >nul
+
+REM Compilar Assets
+echo [2/4] Compilando assets...
 call npm run build >nul 2>&1
 
-REM 2. Limpiar Cache
-echo [2/3] Limpiando sistema...
+REM Limpiar Cache
+echo [3/4] Limpiando cache...
 call php artisan config:clear >nul
 call php artisan cache:clear >nul
 call php artisan view:clear >nul
 
-REM 3. Firewall
-echo [INFO] Configurando Firewall...
-netsh advfirewall firewall add rule name="Laravel 8000" dir=in action=allow protocol=TCP localport=8000 >nul 2>&1
+REM Firewall
+echo [4/4] Configurando firewall (Permitir todo)...
+netsh advfirewall firewall delete rule name="Laravel 8000" >nul 2>&1
+netsh advfirewall firewall add rule name="Laravel 8000" dir=in action=allow protocol=TCP localport=8000 profile=any >nul 2>&1
 
 echo.
 echo ========================================
-echo   TU DIRECCION IP ES:
-echo ========================================
-ipconfig | findstr "IPv4"
+echo   SERVIDOR INICIADO
 echo ========================================
 echo.
-echo EN TU COMPUTADORA (SERVIDOR):
+echo   Nombre del servidor: KAZUMA
+echo.
+echo   [DESDE ESTA PC]
 echo   http://localhost:8000
 echo.
-echo EN TU CELULAR ESCRIBE:
-echo   http://[NUMERO_DE_ARRIBA]:8000
+echo   [DESDE CELULARES]
+echo   http://KAZUMA:8000
 echo.
-echo Ejemplo: Si arriba dice 192.168.1.15, escribe http://192.168.1.15:8000
+echo ========================================
 echo.
 
 REM Ejecutar servidor
