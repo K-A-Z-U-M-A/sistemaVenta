@@ -1,0 +1,236 @@
+/* ========================================
+   OPTIMIZACIONES RESPONSIVE Y TÁCTILES
+   Sistema de Gestión de Bar
+   ======================================== */
+
+/* ===== VARIABLES ===== */
+:root {
+    --touch-target-size: 44px;
+    --header-height: 60px;
+}
+
+/* ===== MEJORAS GENERALES ===== */
+body {
+    overflow-x: hidden;
+    /* Prevenir scroll horizontal en el body */
+}
+
+/* Scroll suave y nativo */
+html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ===== OPTIMIZACIONES PARA MÓVILES (Pantallas < 576px) ===== */
+@media (max-width: 575.98px) {
+
+    /* 1. AJUSTES DE TEXTO Y ESPACIADO */
+    h1 {
+        font-size: 1.5rem !important;
+    }
+
+    h2 {
+        font-size: 1.25rem !important;
+    }
+
+    h3 {
+        font-size: 1.1rem !important;
+    }
+
+    .container-fluid,
+    .container {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .card-body {
+        padding: 10px !important;
+    }
+
+    /* 2. TABLAS EN MÓVILES */
+    .table-responsive {
+        border: 0;
+    }
+
+    .table {
+        font-size: 0.85rem;
+        /* Fuente más pequeña para que quepa más info */
+    }
+
+    .table th,
+    .table td {
+        padding: 0.5rem 0.25rem !important;
+        /* Menos padding en celdas */
+        vertical-align: middle;
+    }
+
+    /* Ocultar columnas menos importantes en móvil para ganar espacio */
+    /* Se puede aplicar la clase .d-none-mobile a los TH y TD que queramos ocultar */
+    .d-none-mobile {
+        display: none !important;
+    }
+
+    /* Botones de acción en tablas más compactos */
+    .btn-group-sm>.btn,
+    .btn-sm {
+        padding: 0.25rem 0.5rem !important;
+        font-size: 0.875rem !important;
+    }
+
+    /* 3. FILTROS Y FORMULARIOS */
+    /* Filtros en una sola columna y ancho completo */
+    .row.g-3>[class*="col-"] {
+        width: 100% !important;
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .form-label {
+        font-size: 0.9rem !important;
+        margin-bottom: 0.25rem !important;
+    }
+
+    .form-control,
+    .form-select {
+        font-size: 16px !important;
+        /* Evita zoom en iOS */
+        min-height: 44px;
+        /* Tamaño táctil */
+    }
+
+    /* Botones de búsqueda y limpiar en bloque */
+    .d-flex.gap-2 {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .d-flex.gap-2 .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    /* 4. MODALES A PANTALLA COMPLETA O CASI COMPLETA */
+    .modal-dialog {
+        margin: 0.5rem;
+        max-width: none !important;
+    }
+
+    .modal-footer {
+        flex-wrap: nowrap;
+        /* Evitar que los botones se rompan feo */
+    }
+
+    .modal-footer .btn {
+        width: 50%;
+        /* Botones comparten el ancho */
+    }
+
+    /* 5. NAVEGACIÓN Y BREADCRUMBS */
+    .breadcrumb {
+        font-size: 0.8rem;
+        background-color: #f8f9fa;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        margin-bottom: 1rem !important;
+    }
+
+    /* Ajustar botón de menú hamburguesa */
+    #sidebarToggle {
+        padding: 0.5rem;
+        margin-right: 0.5rem;
+    }
+}
+
+/* ===== OPTIMIZACIONES PARA TABLETS Y MÓVILES (Pantallas < 992px) ===== */
+@media (max-width: 991.98px) {
+
+    /* Menú lateral colapsable */
+    .sb-sidenav-toggled #layoutSidenav #layoutSidenav_nav {
+        transform: translateX(0);
+    }
+
+    #layoutSidenav #layoutSidenav_nav {
+        transform: translateX(-225px);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    /* Overlay oscuro cuando el menú está abierto (opcional, requiere JS, pero ayuda visualmente si se implementa) */
+    .sb-sidenav-toggled #layoutSidenav_content:before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1039;
+    }
+}
+
+/* ===== MEJORAS TÁCTILES GENERALES ===== */
+.btn {
+    touch-action: manipulation;
+    /* Mejora la respuesta al toque */
+}
+
+/* Botones flotantes o de acción principal más grandes */
+.btn-primary {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Inputs más amigables */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+    min-height: 44px;
+}
+
+/* Badges más legibles */
+.badge {
+    padding: 0.5em 0.75em;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+/* ===== ESTILOS ESPECÍFICOS PARA EL SISTEMA DE VENTAS ===== */
+
+/* Tarjetas de productos en venta (si existen) */
+.producto-card {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.producto-card:active {
+    transform: scale(0.98);
+}
+
+/* Ajuste para SweetAlert2 en móviles */
+div:where(.swal2-container) div:where(.swal2-popup) {
+    width: 95% !important;
+    padding: 1em !important;
+}
+
+/* Ajuste para DataTables en móvil */
+.datatable-wrapper .datatable-container {
+    overflow-x: auto;
+}
+
+.datatable-pagination .datatable-page-link {
+    padding: 0.5rem 0.75rem;
+    /* Botones de paginación más grandes */
+}
+
+/* Ocultar elementos que estorban en móvil */
+@media (max-width: 576px) {
+
+    .dataTables_length,
+    .dataTables_filter {
+        text-align: left !important;
+        margin-bottom: 0.5rem;
+    }
+
+    .dataTables_filter input {
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+}
