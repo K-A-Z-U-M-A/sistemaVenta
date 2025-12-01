@@ -15,7 +15,7 @@
 @include('layouts.partials.alert')
 
 <div class="container-fluid px-4">
-    <h1 class="mt-4 text-center">Usuarios</h1>
+    <h1 class="mt-4 text-center">👥 Usuarios</h1>
     <ol class="breadcrumb mb-4">
         <li class="breadcrumb-item"><a href="{{ route('panel') }}">Inicio</a></li>
         <li class="breadcrumb-item active">Usuarios</li>
@@ -24,20 +24,23 @@
     @can('crear-user')
     <div class="mb-4">
         <a href="{{route('users.create')}}">
-            <button type="button" class="btn btn-primary">Añadir nuevo usuario</button>
+            <button type="button" class="btn btn-primary">
+                <i class="fa-solid fa-user-plus"></i> Añadir Nuevo Usuario
+            </button>
         </a>
     </div>
     @endcan
 
-
-
-    <div class="card">
-        <div class="card-header">
-            <i class="fas fa-table me-1"></i>
-            Tabla de usuarios
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-table me-1"></i>
+                Listado de Usuarios
+            </h5>
         </div>
-        <div class="card-body">
-            <table id="datatablesSimple" class="table table-striped fs-6">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table id="datatablesSimple" class="table table-hover mb-0 fs-6">
                 <thead>
                     <tr>
                         <th>Nombre</th>
@@ -111,7 +114,8 @@
                     </div>
                     @endforeach
                 </tbody>
-            </table>
+                </table>
+            </div>
         </div>
     </div>
 

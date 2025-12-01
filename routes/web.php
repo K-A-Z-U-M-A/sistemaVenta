@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\CajaController;
 use App\Http\Controllers\categoriaController;
 use App\Http\Controllers\clienteController;
@@ -73,9 +74,6 @@ Route::patch('/caja/{caja}/cerrar', [CajaController::class, 'cerrar'])->name('ca
 Route::get('/caja/{caja}', [CajaController::class, 'show'])->name('caja.show');
 Route::get('/caja-balance', [CajaController::class, 'balance'])->name('caja.balance');
 
-// Rutas adicionales para devoluciones
-Route::get('/devoluciones/venta/{venta}/productos', [DevolucionController::class, 'getVentaProductos'])->name('devoluciones.venta-productos');
-
 Route::get('/login',[loginController::class,'index'])->name('login');
 Route::post('/login',[loginController::class,'login']);
 Route::get('/logout',[logoutController::class,'logout'])->name('logout');
@@ -98,11 +96,16 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete('/backups/delete/{file_name}', [App\Http\Controllers\BackupController::class, 'destroy'])->name('backup.destroy');
 });
 
-// Rutas de Mantenimiento del Sistema
+// Rutas de Mantenimiento del Sistema y Registro de Actividad (Solo Administradores)
 Route::group(['middleware' => ['auth', 'role:administrador']], function () {
     Route::get('/system', [App\Http\Controllers\SystemController::class, 'index'])->name('system.index');
     Route::post('/system/optimize', [App\Http\Controllers\SystemController::class, 'optimize'])->name('system.optimize');
     Route::post('/system/cache-config', [App\Http\Controllers\SystemController::class, 'cacheConfig'])->name('system.cache-config');
     Route::post('/system/cache-route', [App\Http\Controllers\SystemController::class, 'cacheRoute'])->name('system.cache-route');
     Route::post('/system/cache-view', [App\Http\Controllers\SystemController::class, 'cacheView'])->name('system.cache-view');
+    
+    // Registro de Actividad
+    Route::get('/activity-log', [ActivityLogController::class, 'index'])->name('activity-log.index');
+    Route::get('/activity-log/{activityLog}', [ActivityLogController::class, 'show'])->name('activity-log.show');
+    Route::post('/activity-log/clean', [ActivityLogController::class, 'clean'])->name('activity-log.clean');
 });

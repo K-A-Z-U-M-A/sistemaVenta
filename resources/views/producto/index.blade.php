@@ -42,7 +42,7 @@
 @include('layouts.partials.alert')
 
 <div class="container-fluid px-4">
-    <h1 class="mt-4 text-center">Productos</h1>
+    <h1 class="mt-4 text-center">📦 Productos</h1>
     <ol class="breadcrumb mb-4">
         <li class="breadcrumb-item"><a href="{{ route('panel') }}">Inicio</a></li>
         <li class="breadcrumb-item active">Productos</li>
@@ -51,13 +51,15 @@
     @can('crear-producto')
     <div class="mb-4">
         <a href="{{route('productos.create')}}">
-            <button type="button" class="btn btn-primary">Añadir nuevo registro</button>
+            <button type="button" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i> Añadir Nuevo Producto
+            </button>
         </a>
     </div>
     @endcan
 
     {{-- Panel de Filtros Avanzados --}}
-    <div class="card mb-4">
+    <div class="card mb-4 border-0 shadow-sm">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#filtrosProductos">
             <div>
                 <i class="fas fa-filter me-2"></i>
@@ -207,14 +209,16 @@
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-header">
-            <i class="fas fa-table me-1"></i>
-            Tabla productos
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-table me-1"></i>
+                Listado de Productos
+            </h5>
         </div>
-        <div class="card-body">
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table id="datatablesSimple" class="table table-striped fs-6">
+                <table id="datatablesSimple" class="table table-hover mb-0 fs-6">
                 <thead>
                     <tr>
                         <th>Código</th>

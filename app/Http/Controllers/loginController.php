@@ -24,6 +24,16 @@ class LoginController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             $user = Auth::user();
+            
+            // Registrar el login
+            \App\Models\ActivityLog::log(
+                'login',
+                "Inició sesión en el sistema",
+                null,
+                null,
+                ['email' => $user->email]
+            );
+            
             return redirect()->route('panel')->with('success', 'Bienvenido ' . $user->name);
         }
 

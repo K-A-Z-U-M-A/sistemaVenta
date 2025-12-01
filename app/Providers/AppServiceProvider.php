@@ -26,5 +26,12 @@ class AppServiceProvider extends ServiceProvider
         if($this->app->environment('production')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
+
+        // Registrar Observers para el sistema de registro de actividad
+        \App\Models\Producto::observe(\App\Observers\ProductoObserver::class);
+        \App\Models\Venta::observe(\App\Observers\VentaObserver::class);
+        \App\Models\User::observe(\App\Observers\UserObserver::class);
+        \App\Models\Categoria::observe(\App\Observers\CategoriaObserver::class);
+        \App\Models\Caja::observe(\App\Observers\CajaObserver::class);
     }
 }

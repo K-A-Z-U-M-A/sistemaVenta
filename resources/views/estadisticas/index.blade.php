@@ -194,34 +194,43 @@
 
 @section('content')
 <div class="container-fluid px-4">
-    <h1 class="mt-4 text-center" data-date="{{ \Carbon\Carbon::now()->format('d/m/Y H:i') }}">Estadísticas y Reportes</h1>
+    <h1 class="mt-4 text-center" data-date="{{ \Carbon\Carbon::now()->format('d/m/Y H:i') }}">📊 Estadísticas y Reportes</h1>
     <ol class="breadcrumb mb-4">
         <li class="breadcrumb-item"><a href="{{ route('panel') }}">Inicio</a></li>
         <li class="breadcrumb-item active">Estadísticas</li>
     </ol>
 
-    <!-- Filtros de Fecha -->
-    <div class="card mb-4">
+    <!-- Filtros de Fecha Mejorados -->
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fa-solid fa-filter"></i> Filtros de Fecha</h5>
+        </div>
         <div class="card-body">
             <form method="GET" action="{{ route('estadisticas.index') }}" class="row g-3">
-                <div class="col-md-4">
-                    <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+                <div class="col-md-3">
+                    <label for="fecha_inicio" class="form-label fw-bold">Fecha Inicio</label>
                     <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" value="{{ $fechaInicio }}">
                 </div>
-                <div class="col-md-4">
-                    <label for="fecha_fin" class="form-label">Fecha Fin</label>
+                <div class="col-md-3">
+                    <label for="fecha_fin" class="form-label fw-bold">Fecha Fin</label>
                     <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="{{ $fechaFin }}">
                 </div>
-                <div class="col-md-4 d-flex align-items-end gap-2">
-                    <button type="submit" class="btn btn-primary flex-fill no-print">
-                        <i class="fa-solid fa-filter"></i> Filtrar
+                <div class="col-md-6 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary no-print">
+                        <i class="fa-solid fa-search"></i> Filtrar
                     </button>
-                    <a href="{{ route('estadisticas.exportar-excel', request()->all()) }}" class="btn btn-success flex-fill no-print">
+                    <a href="{{ route('estadisticas.index') }}" class="btn btn-outline-secondary no-print">
+                        <i class="fa-solid fa-times"></i> Limpiar
+                    </a>
+                    <a href="{{ route('estadisticas.exportar-excel', request()->all()) }}" class="btn btn-success no-print">
                         <i class="fa-solid fa-file-excel"></i> Excel
                     </a>
-                    <a href="{{ route('estadisticas.pdf', request()->all()) }}" class="btn btn-danger flex-fill no-print" target="_blank">
+                    <a href="{{ route('estadisticas.pdf', request()->all()) }}" class="btn btn-danger no-print" target="_blank">
                         <i class="fa-solid fa-file-pdf"></i> PDF
                     </a>
+                    <button onclick="window.print()" class="btn btn-secondary no-print">
+                        <i class="fa-solid fa-print"></i> Imprimir
+                    </button>
                 </div>
             </form>
         </div>
@@ -238,17 +247,18 @@
         Rango: {{ $fechaInicio }} a {{ $fechaFin }}
     </div>
 
-    <!-- Tarjetas de Resumen -->
+    <!-- Tarjetas de Resumen Mejoradas -->
     <div class="row mb-4">
         <div class="col-xl-4 col-md-6 mb-4">
-            <div class="card stat-card border-primary">
+            <div class="card border-0 shadow-sm h-100 stat-card" style="border-left: 5px solid #667eea !important;">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-1">Total Ventas</h6>
-                            <h2 class="mb-0">{{ $totalVentas }}</h2>
+                            <h6 class="text-muted text-uppercase small mb-1">Total Ventas</h6>
+                            <h2 class="mb-0 fw-bold">{{ $totalVentas }}</h2>
+                            <small class="text-muted">Transacciones</small>
                         </div>
-                        <div class="text-primary" style="font-size: 3rem;">
+                        <div class="text-primary" style="font-size: 3.5rem; opacity: 0.2;">
                             <i class="fa-solid fa-shopping-cart"></i>
                         </div>
                     </div>
@@ -257,14 +267,15 @@
         </div>
 
         <div class="col-xl-4 col-md-6 mb-4">
-            <div class="card stat-card border-success">
+            <div class="card border-0 shadow-sm h-100 stat-card" style="border-left: 5px solid #28a745 !important;">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-1">Ingresos Totales</h6>
-                            <h2 class="mb-0">{{ number_format($totalIngresos, 0, ',', '.') }} Gs</h2>
+                            <h6 class="text-muted text-uppercase small mb-1">Ingresos Totales</h6>
+                            <h2 class="mb-0 fw-bold text-success">{{ number_format($totalIngresos, 0, ',', '.') }}</h2>
+                            <small class="text-muted">Guaraníes</small>
                         </div>
-                        <div class="text-success" style="font-size: 3rem;">
+                        <div class="text-success" style="font-size: 3.5rem; opacity: 0.2;">
                             <i class="fa-solid fa-dollar-sign"></i>
                         </div>
                     </div>
@@ -273,14 +284,15 @@
         </div>
 
         <div class="col-xl-4 col-md-6 mb-4">
-            <div class="card stat-card border-info">
+            <div class="card border-0 shadow-sm h-100 stat-card" style="border-left: 5px solid #17a2b8 !important;">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-1">Promedio por Venta</h6>
-                            <h2 class="mb-0">{{ number_format($promedioVenta, 0, ',', '.') }} Gs</h2>
+                            <h6 class="text-muted text-uppercase small mb-1">Promedio por Venta</h6>
+                            <h2 class="mb-0 fw-bold text-info">{{ number_format($promedioVenta, 0, ',', '.') }}</h2>
+                            <small class="text-muted">Guaraníes</small>
                         </div>
-                        <div class="text-info" style="font-size: 3rem;">
+                        <div class="text-info" style="font-size: 3.5rem; opacity: 0.2;">
                             <i class="fa-solid fa-chart-line"></i>
                         </div>
                     </div>
@@ -293,9 +305,9 @@
     <div class="row mb-4">
         <!-- Ventas por Día -->
         <div class="col-lg-6 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fa-solid fa-calendar"></i> Ventas Por Día de la Semana
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fa-solid fa-calendar"></i> Ventas Por Día de la Semana</h5>
                 </div>
                 <div class="card-body">
                     <canvas id="chartVentasPorDia"></canvas>
@@ -305,9 +317,9 @@
 
         <!-- Ventas por Tipo de Producto -->
         <div class="col-lg-6 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fa-solid fa-pie-chart"></i> Ventas por Tipo de Producto
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fa-solid fa-pie-chart"></i> Ventas por Tipo de Producto</h5>
                 </div>
                 <div class="card-body">
                     <canvas id="chartVentasPorTipo"></canvas>
@@ -319,9 +331,9 @@
     <!-- Ventas por Mes -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fa-solid fa-calendar-alt"></i> Ventas por Mes (Histórico)
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fa-solid fa-calendar-alt"></i> Ventas por Mes (Histórico)</h5>
                 </div>
                 <div class="card-body">
                     <canvas id="chartVentasPorMes" height="100"></canvas>
@@ -355,9 +367,9 @@
     <!-- Productos Más Vendidos -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fa-solid fa-trophy"></i> Top 10 Productos Más Vendidos
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fa-solid fa-trophy"></i> Top 10 Productos Más Vendidos</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -390,9 +402,9 @@
     <!-- Ventas por Estado -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fa-solid fa-tasks"></i> Distribución por Estado
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fa-solid fa-tasks"></i> Distribución por Estado</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
