@@ -53,7 +53,7 @@
                                 <div class="flex-grow-1">
                                     <select name="producto_id" id="producto_id" class="form-control selectpicker" data-live-search="true" data-size="1" title="Busque un producto aquí">
                                         @foreach ($productos as $item)
-                                        <option value="{{$item->id}}-{{$item->stock}}-{{$item->precio_venta}}-{{$item->impuesto}}">{{$item->codigo.' '.$item->nombre}}</option>
+                                        <option value="{{$item->id}}-{{$item->stock}}-{{$item->precio_venta}}-{{$item->impuesto}}" data-category="{{ strtolower($item->tipo_producto) }}">{{$item->codigo.' '.$item->nombre}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -298,10 +298,26 @@
                 </div>
                 <div class="modal-body">
                     <input type="text" id="inputBusquedaModal" class="form-control mb-3" placeholder="Buscar por nombre o código...">
+                    
+                    <div class="d-flex justify-content-center mb-3">
+                        <div class="btn-group" role="group" aria-label="Filtro de categorías">
+                            <input type="radio" class="btn-check" name="categoria-filter" id="cat-todos" value="all" checked>
+                            <label class="btn btn-outline-primary" for="cat-todos">Todos</label>
+
+                            <input type="radio" class="btn-check" name="categoria-filter" id="cat-comida" value="comida">
+                            <label class="btn btn-outline-primary" for="cat-comida">Comidas</label>
+
+                            <input type="radio" class="btn-check" name="categoria-filter" id="cat-trago" value="trago">
+                            <label class="btn btn-outline-primary" for="cat-trago">Tragos</label>
+
+                            <input type="radio" class="btn-check" name="categoria-filter" id="cat-bebida" value="bebida">
+                            <label class="btn btn-outline-primary" for="cat-bebida">Bebidas</label>
+                        </div>
+                    </div>
                     <div class="container-fluid px-0">
                         <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2" id="contenedorProductosModal">
                             @foreach ($productos as $item)
-                            <div class="col item-producto-modal">
+                            <div class="col item-producto-modal" data-category="{{ strtolower($item->tipo_producto) }}">
                                 <div class="card h-100 shadow-sm border-0 producto-card btn-seleccionar-modal" 
                                      data-value="{{$item->id}}-{{$item->stock}}-{{$item->precio_venta}}-{{$item->impuesto}}">
                                     
@@ -369,14 +385,21 @@
 
         $('#impuesto').val(impuesto + '%');
         
-        // Lógica del buscador modal
-        $('#inputBusquedaModal').on('keyup', function() {
-            var value = $(this).val().toLowerCase();
+	// Lógica del buscador modal
+        function filterProducts() {
+            var searchText = $('#inputBusquedaModal').val().toLowerCase();
+            var category = $('input[name="categoria-filter"]:checked').val();
             var visibleItems = 0;
-            
+
             $("#contenedorProductosModal .item-producto-modal").filter(function() {
-                var text = $(this).find('.nombre-producto').text().toLowerCase() + " " + $(this).find('small').text().toLowerCase();
-                var match = text.indexOf(value) > -1;
+                var itemText = $(this).find('.nombre-producto').text().toLowerCase() + " " + $(this).find('small').text().toLowerCase();
+                var itemCategory = $(this).data('category');
+
+                var textMatch = itemText.indexOf(searchText) > -1;
+                var categoryMatch = (category === 'all') || (itemCategory && itemCategory.toLowerCase() === category);
+
+                var match = textMatch && categoryMatch;
+                
                 $(this).toggle(match);
                 if(match) visibleItems++;
             });
@@ -386,7 +409,10 @@
             } else {
                 $('#noResults').hide();
             }
-        });
+        }
+
+        $('#inputBusquedaModal').on('keyup', filterProducts);
+        $('input[name="categoria-filter"]').on('change', filterProducts);
 
         // Seleccionar producto del modal (Click en la tarjeta)
         $(document).on('click', '.btn-seleccionar-modal', function() {
@@ -402,6 +428,7 @@
             // Cerrar modal
             $('#modalBuscarProducto').modal('hide');
         });
+
     });
 
     //Variables
