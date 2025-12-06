@@ -36,7 +36,8 @@ class CajaController extends Controller
     public function abrir(Request $request)
     {
         $request->validate([
-            'monto_inicial' => 'required|numeric|min:0'
+            'monto_inicial' => 'required|numeric|min:0',
+            'minimo_tragos_descuento' => 'required|integer|min:1|max:20'
         ]);
 
         // Verificar que no haya una caja abierta
@@ -51,6 +52,7 @@ class CajaController extends Controller
         Caja::create([
             'user_id' => auth()->id(),
             'monto_inicial' => $request->monto_inicial,
+            'minimo_tragos_descuento' => $request->minimo_tragos_descuento,
             'fecha_apertura' => Carbon::now(),
             'estado' => 'abierta'
         ]);
@@ -61,7 +63,7 @@ class CajaController extends Controller
     /**
      * Cerrar caja
      */
-    public function cerrar(Request $request, Caja $caja)
+    public function cerrar(Request $request, Caja $caja, \App\Services\BackupService $backupService)
     {
         $request->validate([
             'monto_final' => 'required|numeric|min:0',
@@ -105,46 +107,24 @@ class CajaController extends Controller
 
         // --- INICIO BACKUP AUTOMATICO ---
         try {
-            $filename = 'backup-' . Carbon::now()->format('Y-m-d-H-i-s') . '.sql';
-            $path = storage_path('app/backups/' . $filename);
+            $result = $backupService->createBackup();
             
-            // Asegurar que existe el directorio
-            if (!file_exists(dirname($path))) {
-                mkdir(dirname($path), 0755, true);
-            }
-
-            // Configuración DB
-            $dbHost = config('database.connections.pgsql.host');
-            $dbPort = config('database.connections.pgsql.port');
-            $dbName = config('database.connections.pgsql.database');
-            $dbUser = config('database.connections.pgsql.username');
-            $dbPass = config('database.connections.pgsql.password');
-
-            // Comando pg_dump (Ruta absoluta para Windows)
-            $pgDumpPath = '"C:\\Program Files\\PostgreSQL\\17\\bin\\pg_dump.exe"';
-            
-            // Construir comando
-            $command = "set PGPASSWORD={$dbPass} && {$pgDumpPath} -h {$dbHost} -p {$dbPort} -U {$dbUser} -F p -f \"{$path}\" {$dbName}";
-            
-            exec($command, $output, $returnVar);
-
-            if ($returnVar === 0) {
+            if ($result['success']) {
                 // Subir a Drive si está configurado
                 if (config('filesystems.disks.google.clientId')) {
                     try {
-                        Storage::disk('google')->put('Backups/' . $filename, file_get_contents($path));
-                        Log::info("Backup subido a Drive: " . $filename);
+                        Storage::disk('google')->put('Backups/' . $result['filename'], file_get_contents($result['path']));
+                        Log::info("Backup subido a Drive: " . $result['filename']);
                     } catch (\Exception $e) {
                         Log::error("Error subiendo a Drive: " . $e->getMessage());
-                        $request->session()->flash('warning', 'Caja cerrada, pero falló la subida a Drive. El backup local está seguro.');
+                        $request->session()->flash('warning', 'Caja cerrada, backup local creado, pero falló Drive.');
                     }
                 }
             } else {
-                Log::error("Error generando backup local. Código: " . $returnVar);
+                Log::error("Error generando backup automático al cerrar caja: " . $result['message']);
             }
-
         } catch (\Exception $e) {
-            Log::error("Error en proceso de backup: " . $e->getMessage());
+            Log::error("Excepción en backup automático: " . $e->getMessage());
         }
         // --- FIN BACKUP AUTOMATICO ---
 

@@ -22,9 +22,10 @@ class StoreCompraRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'proveedore_id' => 'required|exists:proveedores,id',
+            'proveedore_id' => 'nullable|exists:proveedores,id',
+            'nombre_proveedor_local' => 'nullable|string|max:255',
             'comprobante_id' => 'required|exists:comprobantes,id',
-            'numero_comprobante' => 'required|unique:compras,numero_comprobante|max:255',
+            'numero_comprobante' => 'nullable|unique:compras,numero_comprobante|max:255',
             'impuesto' => 'required',
             'fecha_hora' => 'required',
             'total' => 'required'

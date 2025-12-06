@@ -93,12 +93,32 @@
                 </div>
             </div>
 
-            <!---Botón Imprimir Ticket--->
+            <!---Botones de Impresión--->
             <div class="row mb-4">
                 <div class="col-12 text-end">
-                    <a href="{{ route('ventas.imprimir-ticket', $venta) }}" class="btn btn-primary" target="_blank">
-                        <i class="fa-solid fa-print"></i> Imprimir Ticket
-                    </a>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-print"></i> Imprimir Ticket
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="{{ route('ventas.imprimir-ticket', $venta) }}" class="dropdown-item" target="_blank">
+                                    <i class="fa-solid fa-receipt"></i> Imprimir Todo
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a href="{{ route('ventas.imprimir-ticket', ['venta' => $venta, 'tipo' => 'comidas']) }}" class="dropdown-item" target="_blank">
+                                    <i class="fa-solid fa-utensils"></i> Solo Comidas
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('ventas.imprimir-ticket', ['venta' => $venta, 'tipo' => 'tragos']) }}" class="dropdown-item" target="_blank">
+                                    <i class="fa-solid fa-wine-glass"></i> Solo Tragos
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 

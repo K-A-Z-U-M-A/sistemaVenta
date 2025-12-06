@@ -54,9 +54,17 @@ class Producto extends Model
     public function handleUploadImage($image)
     {
         $file = $image;
-        $name = time() . $file->getClientOriginalName();
-        //$file->move(public_path() . '/img/productos/', $name);
-        Storage::putFileAs('/public/productos/',$file,$name,'public');
+        $originalName = $file->getClientOriginalName();
+        
+        // Sanitizar el nombre: remover espacios y caracteres especiales
+        $sanitizedName = preg_replace('/[^A-Za-z0-9\.\-_]/', '_', $originalName);
+        $sanitizedName = str_replace(' ', '_', $sanitizedName);
+        
+        // Agregar timestamp
+        $name = time() . '_' . $sanitizedName;
+        
+        // Guardar en public/imagenes-productos (acceso directo sin symlink)
+        $file->move(public_path('imagenes-productos'), $name);
 
         return $name;
     }

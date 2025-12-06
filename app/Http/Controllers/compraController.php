@@ -72,8 +72,15 @@ class compraController extends Controller
         try{
             DB::beginTransaction();
 
+            $data = $request->validated();
+            
+            // Generar número de comprobante si no existe
+            if (empty($data['numero_comprobante'])) {
+                $data['numero_comprobante'] = 'C' . date('YmdHis');
+            }
+
             //Llenar tabla compras
-            $compra = Compra::create($request->validated());
+            $compra = Compra::create($data);
 
             //Llenar tabla compra_producto
             //1.Recuperar los arrays
@@ -152,5 +159,10 @@ class compraController extends Controller
         ]);
 
         return redirect()->route('compras.index')->with('success','Compra eliminada');
+    }
+
+    public function imprimirTicket(Compra $compra)
+    {
+        return view('compra.ticket', compact('compra'));
     }
 }

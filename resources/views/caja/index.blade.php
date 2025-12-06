@@ -186,6 +186,11 @@
                                     <input type="number" class="form-control form-control-lg" id="monto_inicial" name="monto_inicial" required step="0.01" min="0" value="0">
                                     <small class="text-muted">Dinero con el que inicias la caja</small>
                                 </div>
+                                <div class="mb-3">
+                                    <label for="minimo_tragos_descuento" class="form-label">Mínimo de Tragos para Descuento *</label>
+                                    <input type="number" class="form-control form-control-lg" id="minimo_tragos_descuento" name="minimo_tragos_descuento" required min="1" max="20" value="4">
+                                    <small class="text-muted">A partir de cuántos tragos vendidos se aplicará el descuento (por defecto: 4)</small>
+                                </div>
                                 <div class="alert alert-info">
                                     <i class="fa-solid fa-info-circle"></i> Al abrir la caja, todas las ventas se registrarán en esta sesión.
                                 </div>

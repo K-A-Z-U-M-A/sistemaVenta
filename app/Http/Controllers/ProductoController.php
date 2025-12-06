@@ -12,9 +12,11 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Traits\LogsActivity;
 
 class ProductoController extends Controller
 {
+    use LogsActivity;
     function __construct()
     {
         $this->middleware('permission:ver-producto|crear-producto|editar-producto|eliminar-producto', ['only' => ['index']]);
@@ -189,9 +191,9 @@ class ProductoController extends Controller
             if ($request->hasFile('img_path')) {
                 $name = $producto->handleUploadImage($request->file('img_path'));
 
-                //Eliminar si existiese una imagen
-                if(Storage::disk('public')->exists('productos/'.$producto->img_path)){
-                    Storage::disk('public')->delete('productos/'.$producto->img_path);
+                //Eliminar si existiese una imagen antigua
+                if($producto->img_path && file_exists(public_path('imagenes-productos/'.$producto->img_path))){
+                    unlink(public_path('imagenes-productos/'.$producto->img_path));
                 }
 
             } else {
@@ -208,6 +210,7 @@ class ProductoController extends Controller
                 'presentacione_id' => $request->presentacione_id,
                 'tipo_producto' => $request->tipo_producto,
                 'precio_venta' => $request->precio_venta,
+                'stock' => $request->stock,
                 'impuesto' => $request->impuesto,
                 'aplica_descuento_trago' => $request->has('aplica_descuento_trago') ? 1 : 0
             ]);

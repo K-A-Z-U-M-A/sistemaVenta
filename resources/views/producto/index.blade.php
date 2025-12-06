@@ -313,9 +313,13 @@
                                             <p class="fw-bolder">Imagen:</p>
                                             <div>
                                                 @if ($item->img_path != null)
-                                                <img src="{{ Storage::url('public/productos/'.$item->img_path) }}" alt="{{$item->nombre}}" class="img-fluid img-thumbnail border border-4 rounded">
+                                                <img src="{{ url('imagenes-productos/'.$item->img_path) }}" alt="{{$item->nombre}}" class="img-fluid img-thumbnail border border-4 rounded" 
+                                                     onerror="this.onerror=null; this.src=''; this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                                <div class="text-muted" style="display: none;">
+                                                    <i class="fas fa-image-slash"></i> No se pudo cargar la imagen
+                                                </div>
                                                 @else
-                                                <img src="" alt="{{$item->nombre}}">
+                                                <p class="text-muted"><i class="fas fa-box-open"></i> Sin imagen</p>
                                                 @endif
                                             </div>
                                         </div>

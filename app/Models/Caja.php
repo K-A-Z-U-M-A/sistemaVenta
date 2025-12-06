@@ -12,6 +12,7 @@ class Caja extends Model
     protected $fillable = [
         'user_id',
         'monto_inicial',
+        'minimo_tragos_descuento',
         'monto_final',
         'ingresos_efectivo',
         'ingresos_tarjeta',
@@ -22,6 +23,7 @@ class Caja extends Model
         'fecha_cierre',
         'estado'
     ];
+
 
     protected $casts = [
         'fecha_apertura' => 'datetime',

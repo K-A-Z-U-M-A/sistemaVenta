@@ -184,7 +184,7 @@
 <body onload="window.print()">
     <!-- Header -->
     <div class="header">
-        <h1>{{ env('APP_NAME', 'Sistema de Ventas') }}</h1>
+        <h1>{{ env('APP_NAME', "Doggie's") }}</h1>
         <h2>Reporte de Estadísticas de Ventas</h2>
         <div class="meta">
             Generado el {{ \Carbon\Carbon::now()->format('d/m/Y H:i') }}<br>
@@ -374,7 +374,7 @@
 
     <!-- Footer -->
     <div class="footer">
-        <p><strong>{{ env('APP_NAME', 'Sistema de Ventas') }}</strong></p>
+        <p><strong>{{ env('APP_NAME', "Doggie's") }}</strong></p>
         <p>Este reporte fue generado automáticamente el {{ \Carbon\Carbon::now()->format('d/m/Y') }} a las {{ \Carbon\Carbon::now()->format('H:i') }}</p>
     </div>
 

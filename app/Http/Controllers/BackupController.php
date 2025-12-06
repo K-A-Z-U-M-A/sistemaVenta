@@ -40,65 +40,14 @@ class BackupController extends Controller
         return view('backup.index', compact('backups'));
     }
 
-    public function create()
+    public function create(\App\Services\BackupService $backupService)
     {
-        try {
-            // Configuración de la base de datos
-            $dbName = env('DB_DATABASE');
-            $dbUser = env('DB_USERNAME');
-            $dbHost = env('DB_HOST');
-            $dbPort = env('DB_PORT');
-            $dbPassword = env('DB_PASSWORD');
+        $result = $backupService->createBackup();
 
-            $filename = "backup-" . Carbon::now()->format('Y-m-d-H-i-s') . ".sql";
-            $storagePath = storage_path("app/backups/");
-            
-            if (!file_exists($storagePath)) {
-                mkdir($storagePath, 0777, true);
-            }
-
-            $filePath = $storagePath . $filename;
-
-            // Asegurar que el puerto tenga valor
-            $dbPort = !empty($dbPort) ? $dbPort : '5432';
-
-            // Intentar encontrar pg_dump en rutas comunes de Windows
-            $pgDumpPath = 'pg_dump'; // Por defecto asume que está en el PATH
-            $commonPaths = [
-                'C:\\Program Files\\PostgreSQL\\17\\bin\\pg_dump.exe',
-                'C:\\Program Files\\PostgreSQL\\16\\bin\\pg_dump.exe',
-                'C:\\Program Files\\PostgreSQL\\15\\bin\\pg_dump.exe',
-                'C:\\Program Files\\PostgreSQL\\14\\bin\\pg_dump.exe',
-                'C:\\Program Files\\PostgreSQL\\13\\bin\\pg_dump.exe',
-                'C:\\Program Files\\PostgreSQL\\12\\bin\\pg_dump.exe',
-            ];
-
-            foreach ($commonPaths as $path) {
-                if (file_exists($path)) {
-                    $pgDumpPath = "\"$path\""; // Agregar comillas por si hay espacios
-                    break;
-                }
-            }
-
-            // Comando para Windows corregido
-            // Usamos 2>&1 para capturar stderr en $output
-            // Reordenamos argumentos para mayor seguridad
-            $command = "set PGPASSWORD={$dbPassword} && {$pgDumpPath} -h {$dbHost} -p {$dbPort} -U {$dbUser} -F p -b -v -f \"{$filePath}\" {$dbName} 2>&1";
-
-            exec($command, $output, $returnVar);
-
-            if ($returnVar === 0) {
-                return redirect()->route('backup.index')->with('success', 'Backup creado exitosamente.');
-            } else {
-                // Convertir el array de salida a string para ver el error
-                $errorOutput = implode("\n", $output);
-                // Limitar la longitud del mensaje de error
-                $shortError = substr($errorOutput, 0, 500);
-                return redirect()->route('backup.index')->with('error', 'Error al crear el backup. Código: ' . $returnVar . '. Detalle: ' . $shortError);
-            }
-
-        } catch (\Exception $e) {
-            return redirect()->route('backup.index')->with('error', 'Excepción: ' . $e->getMessage());
+        if ($result['success']) {
+            return redirect()->route('backup.index')->with('success', $result['message']);
+        } else {
+            return redirect()->route('backup.index')->with('error', 'Fallo al crear backup: ' . $result['message']);
         }
     }
 

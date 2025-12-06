@@ -127,6 +127,14 @@ class EstadisticaController extends Controller
             ]);
         }
 
+        // Compras del período
+        $comprasPeriodo = \App\Models\Compra::whereBetween('fecha_hora', [$fechaInicio, $fechaFin])
+            ->where('estado', 1)
+            ->get();
+
+        $totalCompras = $comprasPeriodo->count();
+        $totalGastos = $comprasPeriodo->sum('total');
+
         return view('estadisticas.index', compact(
             'totalVentas',
             'totalIngresos',
@@ -137,7 +145,9 @@ class EstadisticaController extends Controller
             'ventasPorTipo',
             'ventasPorMes',
             'fechaInicio',
-            'fechaFin'
+            'fechaFin',
+            'totalCompras',
+            'totalGastos'
         ));
     }
 

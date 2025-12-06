@@ -5,10 +5,10 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="Sistema de ventas de abarrotes" />
+    <meta name="description" content="Doggie's - Sistema de ventas" />
     <meta name="author" content="SakCode" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Sistema ventas - @yield('title')</title>
+    <title>Doggie's - @yield('title')</title>
     <link rel="manifest" href="{{ asset('manifest.json') }}">
     <link rel="icon" href="{{ asset('img/image.png') }}" type="image/png">
     @stack('css-datatable')
@@ -76,8 +76,8 @@
             // Mostrar mensaje de carga
             container.innerHTML = '<div class="text-secondary"><i class="fas fa-spinner fa-spin"></i> Generando QR...</div>';
             
-            // URL fija: kazuma.local:8000
-            const currentUrl = 'http://kazuma.local:8000';
+            // URL IP (Universal para todos los dispositivos)
+            const currentUrl = 'http://192.168.100.85:8000';
             
             // Actualizar la URL en pantalla
             urlDisplay.textContent = currentUrl;

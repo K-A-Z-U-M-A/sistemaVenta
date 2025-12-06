@@ -12,6 +12,7 @@ use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\loginController;
 use App\Http\Controllers\logoutController;
 use App\Http\Controllers\marcaController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\presentacioneController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\profileController;
@@ -53,6 +54,9 @@ Route::resources([
     'devoluciones' => DevolucionController::class
 ]);
 
+// Rutas adicionales para compras
+Route::get('/compras/{compra}/imprimir', [compraController::class, 'imprimirTicket'])->name('compras.imprimir');
+
 // Rutas adicionales para ventas
 Route::get('/ventas/{venta}/imprimir-ticket', [ventaController::class, 'imprimirTicket'])->name('ventas.imprimir-ticket');
 Route::get('/ventas/{venta}/imprimir-cocina', [ventaController::class, 'imprimirTicketCocina'])->name('ventas.imprimir-cocina');
@@ -77,6 +81,14 @@ Route::get('/caja-balance', [CajaController::class, 'balance'])->name('caja.bala
 Route::get('/login',[loginController::class,'index'])->name('login');
 Route::post('/login',[loginController::class,'login']);
 Route::get('/logout',[logoutController::class,'logout'])->name('logout');
+
+// Rutas de Recuperación de Contraseña
+Route::get('/password/reset', [PasswordResetController::class, 'showRequestForm'])->name('password.request');
+Route::post('/password/send-code', [PasswordResetController::class, 'sendResetCode'])->name('password.send-code');
+Route::get('/password/verify-code', [PasswordResetController::class, 'showVerifyCodeForm'])->name('password.verify-code');
+Route::post('/password/verify-code', [PasswordResetController::class, 'verifyCode'])->name('password.verify-code.submit');
+Route::get('/password/reset-password', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/password/reset-password', [PasswordResetController::class, 'reset'])->name('password.reset.submit');
 
 Route::get('/401', function () {
     return view('pages.401');

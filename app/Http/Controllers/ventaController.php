@@ -89,7 +89,7 @@ class ventaController extends Controller
         }
 
         // Obtener productos directamente sin necesidad de compras
-        $productos = Producto::select('productos.nombre', 'productos.id', 'productos.stock', 'productos.precio_venta', 'productos.tipo_producto', 'productos.aplica_descuento_trago', 'productos.impuesto')
+        $productos = Producto::select('productos.nombre', 'productos.id', 'productos.stock', 'productos.precio_venta', 'productos.tipo_producto', 'productos.aplica_descuento_trago', 'productos.impuesto', 'productos.img_path', 'productos.codigo')
             ->where('productos.estado', 1)
             ->where('productos.stock', '>', 0)
             ->get();
@@ -128,6 +128,27 @@ class ventaController extends Controller
             //Llenar mi tabla venta
             $venta = Venta::create($ventaData);
 
+            // Contar tragos ya vendidos en esta caja (antes de esta venta)
+            $tragosVendidosEnCaja = 0;
+            if ($cajaAbierta) {
+                $ventasAnteriores = Venta::where('caja_id', $cajaAbierta->id)
+                    ->where('estado', 1)
+                    ->where('id', '!=', $venta->id)
+                    ->with('productos')
+                    ->get();
+                    
+                foreach ($ventasAnteriores as $ventaAnterior) {
+                    foreach ($ventaAnterior->productos as $prod) {
+                        if ($prod->tipo_producto === 'trago' && $prod->aplica_descuento_trago) {
+                            $tragosVendidosEnCaja += $prod->pivot->cantidad;
+                        }
+                    }
+                }
+            }
+
+            // Obtener el mínimo de tragos para aplicar descuento
+            $minimoTragos = $cajaAbierta ? $cajaAbierta->minimo_tragos_descuento : 4;
+
             //Llenar mi tabla venta_producto
             //1. Recuperar los arrays
             $arrayProducto_id = $request->get('arrayidproducto');
@@ -139,6 +160,7 @@ class ventaController extends Controller
             $siseArray = count($arrayProducto_id);
             $cont = 0;
             $totalDescuentoTragos = 0;
+            $tragosEnEstaVenta = 0;
 
             while($cont < $siseArray){
                 $producto = Producto::find($arrayProducto_id[$cont]);
@@ -149,9 +171,18 @@ class ventaController extends Controller
                 $descuentoTrago = 0;
                 
                 if ($producto->tipo_producto === 'trago' && $producto->aplica_descuento_trago) {
-                    $esTragoConDescuento = true;
-                    $descuentoTrago = 5000; // 5000 Gs por trago
-                    $totalDescuentoTragos += $descuentoTrago * $cantidad;
+                    // Contar tragos acumulados (vendidos anteriormente + en esta venta hasta ahora)
+                    $tragosAcumulados = $tragosVendidosEnCaja + $tragosEnEstaVenta;
+                    
+                    // Solo aplicar descuento si ya se alcanzó el mínimo
+                    if ($tragosAcumulados >= $minimoTragos) {
+                        $esTragoConDescuento = true;
+                        $descuentoTrago = 5000; // 5000 Gs por trago
+                        $totalDescuentoTragos += $descuentoTrago * $cantidad;
+                    }
+                    
+                    // Incrementar contador de tragos en esta venta
+                    $tragosEnEstaVenta += $cantidad;
                 }
                 
                 $venta->productos()->syncWithoutDetaching([
@@ -277,12 +308,10 @@ class ventaController extends Controller
     /**
      * Imprimir ticket de venta
      */
-    /**
-     * Imprimir ticket de venta
-     */
-    public function imprimirTicket(Venta $venta)
+    public function imprimirTicket(Venta $venta, Request $request)
     {
-        return view('venta.ticket', compact('venta'));
+        $tipo = $request->query('tipo'); // 'comidas', 'tragos', o null (todo)
+        return view('venta.ticket', compact('venta', 'tipo'));
     }
 
     /**

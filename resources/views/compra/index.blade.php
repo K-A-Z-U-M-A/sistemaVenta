@@ -161,8 +161,13 @@
                             <p class="text-muted mb-0">{{$item->numero_comprobante}}</p>
                         </td>
                         <td>
-                            <p class="fw-semibold mb-1">{{ ucfirst($item->proveedore->persona->tipo_persona) }}</p>
-                            <p class="text-muted mb-0">{{$item->proveedore->persona->razon_social}}</p>
+                            @if($item->proveedore)
+                                <p class="fw-semibold mb-1">{{ ucfirst($item->proveedore->persona->tipo_persona) }}</p>
+                                <p class="text-muted mb-0">{{$item->proveedore->persona->razon_social}}</p>
+                            @else
+                                <p class="fw-semibold mb-1">Local</p>
+                                <p class="text-muted mb-0">{{ $item->nombre_proveedor_local ?? 'Sin Proveedor' }}</p>
+                            @endif
                         </td>
                         <td>
                             <div class="row-not-space">
@@ -184,6 +189,10 @@
                                 </form>
                                 @endcan
 
+                                <a href="{{ route('compras.imprimir', $item) }}" class="btn btn-warning" target="_blank" title="Imprimir">
+                                    <i class="fa-solid fa-print"></i>
+                                </a>
+
                                 @can('eliminar-compra')
                                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmModal-{{$item->id}}">Eliminar</button>
                                 @endcan
@@ -193,33 +202,36 @@
 
                     </tr>
 
-                    <!-- Modal de confirmación-->
-                    <div class="modal fade" id="confirmModal-{{$item->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Mensaje de confirmación</h1>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    ¿Seguro que quieres eliminar el registro?
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                    <form action="{{ route('compras.destroy',['compra'=>$item->id]) }}" method="post">
-                                        @method('DELETE')
-                                        @csrf
-                                        <button type="submit" class="btn btn-danger">Confirmar</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     @endforeach
                 </tbody>
             </table>
         </div>
     </div>
+
+    <!-- Modales de confirmación -->
+    @foreach ($compras as $item)
+    <div class="modal fade" id="confirmModal-{{$item->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Mensaje de confirmación</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Seguro que quieres eliminar el registro?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <form action="{{ route('compras.destroy',['compra'=>$item->id]) }}" method="post">
+                        @method('DELETE')
+                        @csrf
+                        <button type="submit" class="btn btn-danger">Confirmar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
 
 </div>
 

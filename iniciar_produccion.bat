@@ -14,11 +14,12 @@ REM Compilar Assets
 echo [2/4] Compilando assets...
 call npm run build >nul 2>&1
 
-REM Limpiar Cache
-echo [3/4] Limpiando cache...
-call php artisan config:clear >nul
-call php artisan cache:clear >nul
-call php artisan view:clear >nul
+REM Optimizar Cache (Mejora velocidad de respuesta)
+echo [3/4] Optimizando sistema...
+call php artisan config:cache >nul
+call php artisan route:cache >nul
+call php artisan view:cache >nul
+call php artisan event:cache >nul
 
 REM Firewall
 echo [4/4] Configurando firewall (Permitir todo)...
@@ -42,6 +43,6 @@ echo ========================================
 echo.
 
 REM Ejecutar servidor
-php artisan serve --host=0.0.0.0 --port=8000
+php -d memory_limit=512M artisan serve --host=0.0.0.0 --port=8000
 
 pause

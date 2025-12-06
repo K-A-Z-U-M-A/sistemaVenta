@@ -5,13 +5,21 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="Sistema de Abarrotes - Inicio de sesión" />
-    <meta name="author" content="Sistema Abarrotes" />
-    <title>Sistema de Abarrotes - Login</title>
+    <meta name="description" content="Doggie's - Inicio de sesión" />
+    <meta name="author" content="Doggie's" />
+    <title>Doggie's - Login</title>
     <link rel="icon" href="{{ asset('img/image.png') }}" type="image/png">
+    
+    <!-- Preconnect para recursos externos - mejora significativa de velocidad -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://use.fontawesome.com">
+    
+    <!-- Fuentes optimizadas con display=swap -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+    <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous" defer></script>
     <style>
         * {
             margin: 0;
@@ -146,6 +154,30 @@
             background: #ffe5e0;
             color: #d63031;
         }
+        
+        .alert-warning {
+            background: #fff4e5;
+            color: #e17055;
+            border-left: 4px solid #ff6b35;
+        }
+        
+        .btn-force-login {
+            width: 100%;
+            padding: 10px;
+            background: #e17055;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        
+        .btn-force-login:hover {
+            background: #d63031;
+        }
 
         .footer-text {
             text-align: center;
@@ -223,7 +255,7 @@
         <div class="login-card">
             <div class="login-header">
                 <img src="{{ asset('img/image.png') }}" alt="Logo" class="login-logo">
-                <h2>Sistema de Abarrotes</h2>
+                <h2>Doggie's</h2>
                 <p>Ingresa tus credenciales para continuar</p>
             </div>
             
@@ -234,6 +266,24 @@
                             <i class="fas fa-exclamation-circle me-2"></i>{{ $item }}
                         </div>
                     @endforeach
+                @endif
+                
+                @if(session('warning') && session('show_force_login'))
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Sesión Activa Detectada</strong>
+                        <p class="mb-2 mt-1">{{ session('warning') }}</p>
+                        <p class="mb-2"><strong>¿Deseas cerrar la sesión activa y continuar?</strong></p>
+                        <form action="/login" method="post">
+                            @csrf
+                            <input type="hidden" name="email" value="{{ session('email_to_force') ?? old('email') }}">
+                            <input type="hidden" name="password" value="{{ old('password') }}">
+                            <input type="hidden" name="force_login" value="1">
+                            <button type="submit" class="btn-force-login">
+                                <i class="fas fa-sign-out-alt me-2"></i>Sí, cerrar sesión anterior e iniciar aquí
+                            </button>
+                        </form>
+                    </div>
                 @endif
 
                 <form action="/login" method="post" id="loginForm">
@@ -279,16 +329,22 @@
                     <button class="btn-login" type="submit" id="loginBtn">
                         <i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión
                     </button>
+                    
+                    <div class="text-center mt-3">
+                        <a href="{{ route('password.request') }}" style="color: #ff6b35; text-decoration: none; font-size: 14px;">
+                            <i class="fas fa-question-circle me-1"></i> ¿Olvidaste tu contraseña?
+                        </a>
+                    </div>
                 </form>
 
                 <div class="footer-text">
-                    <p>&copy; 2025 Sistema de Abarrotes. Todos los derechos reservados.</p>
+                    <p>&copy; 2025 Doggie's. Todos los derechos reservados.</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
     <script>
         // Toggle password visibility
         const togglePassword = document.getElementById('togglePassword');

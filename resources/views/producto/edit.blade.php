@@ -71,6 +71,28 @@
                         @error('img_path')
                         <small class="text-danger">{{'*'.$message}}</small>
                         @enderror
+                        
+                        {{-- Vista previa de la imagen actual --}}
+                        @if($producto->img_path)
+                        <div class="mt-3">
+                            <label class="form-label">Imagen actual:</label>
+                            <div class="border rounded p-2">
+                                <img src="{{ url('imagenes-productos/'.$producto->img_path) }}" 
+                                     alt="{{$producto->nombre}}" 
+                                     class="img-fluid img-thumbnail"
+                                     style="max-height: 200px;"
+                                     onerror="this.onerror=null; this.src=''; this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div class="text-muted" style="display: none;">
+                                    <i class="fas fa-image-slash"></i> No se pudo cargar la imagen
+                                </div>
+                            </div>
+                            <small class="text-muted">Nombre del archivo: {{ $producto->img_path }}</small>
+                        </div>
+                        @else
+                        <div class="mt-2">
+                            <small class="text-muted"><i class="fas fa-info-circle"></i> Este producto no tiene imagen.</small>
+                        </div>
+                        @endif
                     </div>
 
                     <!---Marca---->
@@ -142,6 +164,16 @@
                         <label for="precio_venta" class="form-label">Precio de Venta:</label>
                         <input type="number" name="precio_venta" id="precio_venta" class="form-control" step="0.01" min="0" value="{{old('precio_venta', $producto->precio_venta)}}">
                         @error('precio_venta')
+                        <small class="text-danger">{{'*'.$message}}</small>
+                        @enderror
+                    </div>
+
+                    <!---Stock---->
+                    <div class="col-md-6">
+                        <label for="stock" class="form-label">Stock Actual:</label>
+                        <input type="number" name="stock" id="stock" class="form-control" min="0" value="{{old('stock', $producto->stock)}}">
+                        <small class="text-muted">Edita el stock manualmente si es necesario</small>
+                        @error('stock')
                         <small class="text-danger">{{'*'.$message}}</small>
                         @enderror
                     </div>

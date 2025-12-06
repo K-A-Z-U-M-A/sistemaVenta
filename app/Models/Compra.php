@@ -15,7 +15,8 @@ class Compra extends Model
         'numero_comprobante',
         'total',
         'comprobante_id',
-        'proveedore_id'
+        'proveedore_id',
+        'nombre_proveedor_local'
     ];
 
     public function proveedore(){

@@ -12,12 +12,18 @@ class logoutController extends Controller
     public function logout(){
         // Registrar el logout antes de cerrar sesión
         if (Auth::check()) {
+            $user = Auth::user();
+            
             \App\Models\ActivityLog::log(
                 'logout',
                 "Cerró sesión en el sistema",
                 null,
                 null
             );
+            
+            // Limpiar session_id del usuario
+            $user->session_id = null;
+            $user->save();
         }
         
         Session::flush();

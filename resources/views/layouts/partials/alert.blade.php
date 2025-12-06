@@ -1,7 +1,7 @@
 @if (session('success'))
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        var message = {!! json_encode(session('success')) !!};
+        var message = @json(session('success'));
         var Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
@@ -25,7 +25,7 @@
 @if (session('error'))
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        var message = {!! json_encode(session('error')) !!};
+        var message = @json(session('error'));
         Swal.fire({
             icon: 'error',
             title: '¡Atención!',

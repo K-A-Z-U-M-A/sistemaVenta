@@ -27,6 +27,12 @@
         <li class="breadcrumb-item"><a href="{{ route('compras.index')}}">Compras</a></li>
         <li class="breadcrumb-item active">Ver Compra</li>
     </ol>
+    
+    <div class="mb-4 text-end">
+        <a href="{{ route('compras.imprimir', $compra) }}" class="btn btn-primary" target="_blank">
+            <i class="fa-solid fa-print"></i> Imprimir Comprobante
+        </a>
+    </div>
 </div>
 
 <div class="container-fluid">
@@ -81,7 +87,7 @@
                 <div class="col-sm-6">
                     <div class="input-group">
                         <span title="Proveedor" id="icon-form" class="input-group-text"><i class="fa-solid fa-user-tie"></i></span>
-                        <input disabled type="text" class="form-control" value="{{$compra->proveedore->persona->razon_social}}">
+                        <input disabled type="text" class="form-control" value="{{$compra->proveedore ? $compra->proveedore->persona->razon_social : ($compra->nombre_proveedor_local ?? 'Local (Sin Proveedor)')}}">
                     </div>
                 </div>
             </div>

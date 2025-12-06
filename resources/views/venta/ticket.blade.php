@@ -109,7 +109,10 @@
     <div class="ticket">
         <!-- Header -->
         <div class="header">
-            <h2>{{ env('APP_NAME', 'Sistema de Ventas') }}</h2>
+            <h2>{{ env('APP_NAME', "Doggie's") }}</h2>
+            @if(isset($tipo))
+                <p><strong>*** {{ strtoupper($tipo) }} ***</strong></p>
+            @endif
             <p>{{ env('BUSINESS_SLOGAN', 'Gracias por su preferencia') }}</p>
         </div>
 
@@ -152,13 +155,29 @@
                 <span>PRODUCTO</span>
                 <span>TOTAL</span>
             </div>
-            @foreach ($venta->productos as $producto)
+            @php
+                $productosFiltrados = $venta->productos;
+                if (isset($tipo)) {
+                    if ($tipo === 'comidas') {
+                        $productosFiltrados = $productosFiltrados->filter(function($p) {
+                            return $p->tipo_producto !== 'trago';
+                        });
+                    } elseif ($tipo === 'tragos') {
+                        $productosFiltrados = $productosFiltrados->filter(function($p) {
+                            return $p->tipo_producto === 'trago';
+                        });
+                    }
+                }
+                $totalFiltrado = 0;
+            @endphp
+            @foreach ($productosFiltrados as $producto)
             <div class="product-row">
                 <div class="product-name">{{ $producto->nombre }}</div>
                 <div class="product-details">
                     <span>{{ $producto->pivot->cantidad }} x {{ number_format($producto->pivot->precio_venta, 0, ',', '.') }}</span>
                     @php
                         $lineTotal = ($producto->pivot->cantidad * $producto->pivot->precio_venta) - $producto->pivot->descuento - ($producto->pivot->cantidad * $producto->pivot->descuento_trago);
+                        $totalFiltrado += $lineTotal;
                     @endphp
                     <span><strong>{{ number_format($lineTotal, 0, ',', '.') }}</strong></span>
                 </div>
@@ -168,15 +187,9 @@
 
         <!-- Totals -->
         <div class="totals">
-            @if($venta->impuesto > 0)
-            <div class="total-row">
-                <span>IVA:</span>
-                <span>{{ number_format($venta->impuesto, 0, ',', '.') }} Gs</span>
-            </div>
-            @endif
             <div class="total-row main">
-                <span>TOTAL:</span>
-                <span>{{ number_format($venta->total, 0, ',', '.') }} Gs</span>
+                <span>TOTAL{{ isset($tipo) ? ' (' . strtoupper($tipo) . ')' : '' }}:</span>
+                <span>{{ number_format(isset($tipo) ? $totalFiltrado : $venta->total, 0, ',', '.') }} Gs</span>
             </div>
         </div>
 

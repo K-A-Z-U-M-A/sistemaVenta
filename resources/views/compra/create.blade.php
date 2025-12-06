@@ -31,12 +31,27 @@
                 <div class="p-3 border border-3 border-primary">
                     <div class="row">
                         <!-----Producto---->
-                        <div class="col-12 mb-4">
-                            <select name="producto_id" id="producto_id" class="form-control selectpicker" data-live-search="true" data-size="1" title="Busque un producto aquí">
-                                @foreach ($productos as $item)
-                                <option value="{{$item->id}}">{{$item->codigo.' '.$item->nombre}}</option>
-                                @endforeach
-                            </select>
+                        <div class="col-12 mb-2">
+                            <div class="d-flex">
+                                <div class="flex-grow-1">
+                                    <select name="producto_id" id="producto_id" class="form-control selectpicker" data-live-search="true" data-size="1" title="Busque un producto aquí">
+                                        @foreach ($productos as $item)
+                                        <option value="{{$item->id}}-{{$item->stock}}-{{$item->impuesto}}">{{$item->codigo.' '.$item->nombre}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary ms-2" type="button" data-bs-toggle="modal" data-bs-target="#modalBuscarProducto">
+                                    <i class="fa-solid fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-----Stock Actual (Referencia)---->
+                        <div class="col-12 mb-2">
+                            <div class="d-flex justify-content-end">
+                                <label for="stock" class="col-form-label me-2">Stock Actual:</label>
+                                <input disabled id="stock" type="text" class="form-control" style="width: 100px;">
+                            </div>
                         </div>
 
                         <!-----Cantidad---->
@@ -96,7 +111,7 @@
                                         </tr>
                                         <tr>
                                             <th></th>
-                                            <th colspan="4">IVA %</th>
+                                            <th colspan="4">IVA</th>
                                             <th colspan="2"><span id="igv">0</span></th>
                                         </tr>
                                         <tr>
@@ -131,11 +146,22 @@
                         <div class="col-12 mb-2">
                             <label for="proveedore_id" class="form-label">Proveedor:</label>
                             <select name="proveedore_id" id="proveedore_id" class="form-control selectpicker show-tick" data-live-search="true" title="Selecciona" data-size='2'>
+                                <option value="" selected>Nombre Local (Sin Proveedor)</option>
                                 @foreach ($proveedores as $item)
                                 <option value="{{$item->id}}">{{$item->persona->razon_social}}</option>
                                 @endforeach
                             </select>
                             @error('proveedore_id')
+                            <small class="text-danger">{{ '*'.$message }}</small>
+                            @enderror
+                        </div>
+
+                        <!--Nombre Local (Opcional)-->
+                        <div class="col-12 mb-2">
+                            <label for="nombre_proveedor_local" class="form-label">Nombre Local: <small class="text-muted">(Opcional)</small></label>
+                            <input type="text" name="nombre_proveedor_local" id="nombre_proveedor_local" class="form-control" placeholder="Ej: Tienda de la esquina">
+                            <small class="form-text text-muted">Para compras rápidas sin proveedor registrado</small>
+                            @error('nombre_proveedor_local')
                             <small class="text-danger">{{ '*'.$message }}</small>
                             @enderror
                         </div>
@@ -155,8 +181,8 @@
 
                         <!--Numero de comprobante-->
                         <div class="col-12 mb-2">
-                            <label for="numero_comprobante" class="form-label">Numero de comprobante:</label>
-                            <input required type="text" name="numero_comprobante" id="numero_comprobante" class="form-control">
+                            <label for="numero_comprobante" class="form-label">Numero de comprobante: <small class="text-muted">(Opcional)</small></label>
+                            <input type="text" name="numero_comprobante" id="numero_comprobante" class="form-control" placeholder="Dejar vacío para generar automáticamente">
                             @error('numero_comprobante')
                             <small class="text-danger">{{ '*'.$message }}</small>
                             @enderror
@@ -164,14 +190,13 @@
 
                         <!--Impuesto---->
                         <div class="col-sm-6 mb-2">
-                            <label for="impuesto" class="form-label">Impuesto(IVA):</label>
+                            <label for="impuesto" class="form-label">Total Impuesto(IVA):</label>
                             <input readonly type="text" name="impuesto" id="impuesto" class="form-control border-success">
                             @error('impuesto')
                             <small class="text-danger">{{ '*'.$message }}</small>
                             @enderror
                         </div>
-
-                        <!--Fecha--->
+                        
                         <div class="col-sm-6 mb-2">
                             <label for="fecha" class="form-label">Fecha:</label>
                             <input readonly type="date" name="fecha" id="fecha" class="form-control border-success" value="<?php echo date("Y-m-d") ?>">
@@ -214,6 +239,53 @@
         </div>
     </div>
 
+    <!-- Modal Buscar Producto Avanzado -->
+    <div class="modal fade" id="modalBuscarProducto" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Buscar Producto (Ver Todo)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="inputBusquedaModal" class="form-control mb-3" placeholder="Escribe para filtrar por nombre o código...">
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-hover table-bordered table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Stock Actual</th>
+                                    <th>Precio Venta Actual</th>
+                                    <th>IVA</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaProductosModal">
+                                @foreach ($productos as $item)
+                                <tr class="fila-producto-modal">
+                                    <td class="nombre-producto">{{$item->codigo.' - '.$item->nombre}}</td>
+                                    <td>{{$item->stock}}</td>
+                                    <td>{{ number_format($item->precio_venta, 0, ',', '.') }}</td>
+                                    <td>{{ $item->impuesto }}%</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-success btn-seleccionar-modal" 
+                                            data-value="{{$item->id}}-{{$item->stock}}-{{$item->impuesto}}">
+                                            Seleccionar
+                                        </button>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </form>
 @endsection
 
@@ -231,18 +303,45 @@
 
         disableButtons();
 
-        $('#impuesto').val(impuesto + '%');
+        // Evento cambio de producto
+        $('#producto_id').change(mostrarValores);
+
+        // Lógica del buscador modal
+        $('#inputBusquedaModal').on('keyup', function() {
+            var value = $(this).val().toLowerCase();
+            $("#tablaProductosModal tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+
+        // Seleccionar producto del modal
+        $('.btn-seleccionar-modal').click(function() {
+            var value = $(this).data('value');
+            
+            // Seleccionar en el dropdown principal
+            $('#producto_id').val(value);
+            $('#producto_id').selectpicker('refresh');
+            
+            // Disparar evento change para actualizar stock
+            mostrarValores();
+            
+            // Cerrar modal
+            $('#modalBuscarProducto').modal('hide');
+        });
     });
 
     //Variables
     let cont = 0;
     let subtotal = [];
+    let ivas = [];
     let sumas = 0;
     let igv = 0;
     let total = 0;
 
-    //Constantes
-    const impuesto = 10;
+    function mostrarValores() {
+        let dataProducto = document.getElementById('producto_id').value.split('-');
+        $('#stock').val(dataProducto[1]);
+    }
 
     function cancelarCompra() {
         //Elimar el tbody de la tabla
@@ -263,21 +362,20 @@
         //Reiniciar valores de las variables
         cont = 0;
         subtotal = [];
+        ivas = [];
         sumas = 0;
         igv = 0;
         total = 0;
 
-        //Mostrar los campos calculados
+        // Actualizar UI
         $('#sumas').html(sumas);
         $('#igv').html(igv);
         $('#total').html(total);
-        $('#impuesto').val(impuesto + '%');
+        $('#impuesto').val(igv);
         $('#inputTotal').val(total);
 
         limpiarCampos();
         disableButtons();
-
-
     }
 
     function disableButtons() {
@@ -292,7 +390,9 @@
 
     function agregarProducto() {
         //Obtener valores de los campos
-        let idProducto = $('#producto_id').val();
+        let dataProducto = document.getElementById('producto_id').value.split('-');
+        let idProducto = dataProducto[0];
+        let impuestoProducto = parseFloat(dataProducto[2]) || 0;
         let nameProducto = ($('#producto_id option:selected').text()).split(' ')[1];
         let cantidad = $('#cantidad').val();
         let precioCompra = $('#precio_compra').val();
@@ -308,9 +408,16 @@
                 //3. Para que el precio de compra sea menor que el precio de venta
                 if (parseFloat(precioVenta) > parseFloat(precioCompra)) {
                     //Calcular valores
+                    // Subtotal es cantidad * precio_compra (Base Imponible)
                     subtotal[cont] = round(cantidad * precioCompra);
                     sumas += subtotal[cont];
-                    igv = round(sumas / 100 * impuesto);
+                    
+                    // Calcular IVA de esta línea: Subtotal * (Tasa / 100)
+                    let ivaLinea = round(subtotal[cont] * (impuestoProducto / 100));
+                    ivas[cont] = ivaLinea;
+                    igv += ivaLinea;
+                    
+                    // Total = Sumas (Base) + IGV (Impuestos)
                     total = round(sumas + igv);
 
                     //Crear la fila
@@ -347,15 +454,12 @@
         } else {
             showModal('Le faltan campos por llenar');
         }
-
-
-
     }
 
     function eliminarProducto(indice) {
         //Calcular valores
         sumas -= round(subtotal[indice]);
-        igv = round(sumas / 100 * impuesto);
+        igv -= round(ivas[indice]);
         total = round(sumas + igv);
 
         //Mostrar los campos calculados
@@ -363,13 +467,12 @@
         $('#igv').html(igv);
         $('#total').html(total);
         $('#impuesto').val(igv);
-        $('#InputTotal').val(total);
+        $('#inputTotal').val(total);
 
         //Eliminar el fila de la tabla
         $('#fila' + indice).remove();
 
         disableButtons();
-
     }
 
     function limpiarCampos() {
@@ -378,6 +481,7 @@
         $('#cantidad').val('');
         $('#precio_compra').val('');
         $('#precio_venta').val('');
+        $('#stock').val('');
     }
 
     function round(num, decimales = 2) {

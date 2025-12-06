@@ -301,6 +301,44 @@
         </div>
     </div>
 
+    <!-- Tarjetas de Compras -->
+    <h5 class="mb-3 text-muted"><i class="fa-solid fa-shopping-bag"></i> Resumen de Compras</h5>
+    <div class="row mb-4">
+        <div class="col-xl-6 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100 stat-card" style="border-left: 5px solid #dc3545 !important;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted text-uppercase small mb-1">Total Compras</h6>
+                            <h2 class="mb-0 fw-bold">{{ $totalCompras }}</h2>
+                            <small class="text-muted">Transacciones</small>
+                        </div>
+                        <div class="text-danger" style="font-size: 3.5rem; opacity: 0.2;">
+                            <i class="fa-solid fa-shopping-bag"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100 stat-card" style="border-left: 5px solid #ffc107 !important;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted text-uppercase small mb-1">Gastos Totales</h6>
+                            <h2 class="mb-0 fw-bold text-warning">{{ number_format($totalGastos, 0, ',', '.') }}</h2>
+                            <small class="text-muted">Guaraníes</small>
+                        </div>
+                        <div class="text-warning" style="font-size: 3.5rem; opacity: 0.2;">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Gráficos -->
     <div class="row mb-4">
         <!-- Ventas por Día -->

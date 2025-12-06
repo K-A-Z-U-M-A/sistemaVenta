@@ -33,6 +33,7 @@ class UpdateProductoRequest extends FormRequest
             'categorias' => 'required',
             'tipo_producto' => 'required|in:comida,bebida,trago',
             'precio_venta' => 'required|numeric|min:0',
+            'stock' => 'nullable|integer|min:0',
             'impuesto' => 'required|numeric|in:0,5,10',
             'aplica_descuento_trago' => 'nullable|boolean'
         ];

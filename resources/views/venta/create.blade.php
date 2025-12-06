@@ -1,3 +1,7 @@
+@php
+    use Illuminate\Support\Facades\Storage;
+@endphp
+
 @extends('layouts.app')
 
 @section('title','Realizar venta')
@@ -274,42 +278,56 @@
 
     <!-- Modal Buscar Producto Avanzado -->
     <div class="modal fade" id="modalBuscarProducto" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable modal-fullscreen-sm-down">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Buscar Producto (Ver Todo)</h5>
+                    <h5 class="modal-title">Buscar Producto</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="text" id="inputBusquedaModal" class="form-control mb-3" placeholder="Escribe para filtrar por nombre o código...">
-                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                        <table class="table table-hover table-bordered table-striped">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>Producto</th>
-                                    <th>Tipo</th>
-                                    <th>Stock</th>
-                                    <th>Precio</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tablaProductosModal">
-                                @foreach ($productos as $item)
-                                <tr class="fila-producto-modal">
-                                    <td class="nombre-producto">{{$item->codigo.' - '.$item->nombre}}</td>
-                                    <td>{{ ucfirst($item->tipo_producto ?? 'N/A') }}</td>
-                                    <td>{{$item->stock}}</td>
-                                    <td>{{ number_format($item->precio_venta, 0, ',', '.') }}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-success btn-seleccionar-modal" 
-                                            data-value="{{$item->id}}-{{$item->stock}}-{{$item->precio_venta}}-{{$item->impuesto}}">
-                                            Seleccionar
-                                        </button>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                    <input type="text" id="inputBusquedaModal" class="form-control mb-3" placeholder="Buscar por nombre o código...">
+                    <div class="container-fluid px-0">
+                        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2" id="contenedorProductosModal">
+                            @foreach ($productos as $item)
+                            <div class="col item-producto-modal">
+                                <div class="card h-100 shadow-sm border-0 producto-card btn-seleccionar-modal" 
+                                     style="cursor: pointer; transition: transform 0.2s;"
+                                     data-value="{{$item->id}}-{{$item->stock}}-{{$item->precio_venta}}-{{$item->impuesto}}"
+                                     onmouseover="this.style.transform='scale(1.03)'" 
+                                     onmouseout="this.style.transform='scale(1)'">
+                                    
+                                    <div class="position-relative" style="padding-top: 100%; overflow: hidden;">
+                                        @if($item->img_path)
+                                            <img src="{{ url('imagenes-productos/'.$item->img_path) }}" 
+                                                 class="card-img-top producto-imagen" 
+                                                 alt="{{$item->nombre}}" 
+                                                 style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"
+                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                            <div class="bg-secondary align-items-center justify-content-center text-white" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;">
+                                                <i class="fas fa-box-open fa-2x"></i>
+                                            </div>
+                                        @else
+                                            <div class="bg-secondary d-flex align-items-center justify-content-center text-white" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                                                <i class="fas fa-box-open fa-2x"></i>
+                                            </div>
+                                        @endif
+                                        <span class="position-absolute top-0 end-0 badge rounded-pill bg-{{ $item->stock > 0 ? 'success' : 'danger' }} m-1" style="font-size: 0.65rem;">
+                                            {{$item->stock}}
+                                        </span>
+                                    </div>
+
+                                    <div class="card-body p-2 text-center">
+                                        <h6 class="card-title mb-1 text-truncate nombre-producto small" title="{{$item->nombre}}">{{$item->nombre}}</h6>
+                                        <small class="text-muted d-block mb-1" style="font-size: 0.7rem;">{{$item->codigo}}</small>
+                                        <div class="fw-bold text-primary" style="font-size: 0.9rem;">{{ number_format($item->precio_venta, 0, ',', '.') }} Gs</div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                        <div id="noResults" class="text-center mt-4" style="display: none;">
+                            <p class="text-muted">No se encontraron productos</p>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -345,13 +363,24 @@
         // Lógica del buscador modal
         $('#inputBusquedaModal').on('keyup', function() {
             var value = $(this).val().toLowerCase();
-            $("#tablaProductosModal tr").filter(function() {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            var visibleItems = 0;
+            
+            $("#contenedorProductosModal .item-producto-modal").filter(function() {
+                var text = $(this).find('.nombre-producto').text().toLowerCase() + " " + $(this).find('small').text().toLowerCase();
+                var match = text.indexOf(value) > -1;
+                $(this).toggle(match);
+                if(match) visibleItems++;
             });
+
+            if(visibleItems === 0) {
+                $('#noResults').show();
+            } else {
+                $('#noResults').hide();
+            }
         });
 
-        // Seleccionar producto del modal
-        $('.btn-seleccionar-modal').click(function() {
+        // Seleccionar producto del modal (Click en la tarjeta)
+        $(document).on('click', '.btn-seleccionar-modal', function() {
             var value = $(this).data('value');
             
             // Seleccionar en el dropdown principal
