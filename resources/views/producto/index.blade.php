@@ -270,7 +270,13 @@
                                 @endcan
 
                                 @can('ver-producto')
-                                <button type="button" class="btn btn-info btn-sm text-white" data-bs-toggle="modal" data-bs-target="#verModal-{{$item->id}}" title="Ver">
+                                <button type="button" class="btn btn-info btn-sm text-white btn-ver-producto" 
+                                        data-nombre="{{$item->nombre}}"
+                                        data-descripcion="{{$item->descripcion}}"
+                                        data-vencimiento="{{$item->fecha_vencimiento}}"
+                                        data-stock="{{$item->stock}}"
+                                        data-img="{{ $item->img_path ? url('imagenes-productos/'.$item->img_path) : '' }}"
+                                        title="Ver">
                                     <i class="fa-solid fa-eye"></i>
                                 </button>
                                 @endcan
@@ -287,50 +293,9 @@
                                     @endif
                                 @endcan
                             </div>
-                        </td>
-                    </tr>
 
-                    <!-- Modal -->
-                    <div class="modal fade" id="verModal-{{$item->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-scrollable">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Detalles del producto</h1>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <p><span class="fw-bolder">Descripción: </span>{{$item->descripcion}}</p>
-                                        </div>
-                                        <div class="col-12">
-                                            <p><span class="fw-bolder">Fecha de vencimiento: </span>{{$item->fecha_vencimiento=='' ? 'No tiene' : $item->fecha_vencimiento}}</p>
-                                        </div>
-                                        <div class="col-12">
-                                            <p><span class="fw-bolder">Stock: </span>{{$item->stock}}</p>
-                                        </div>
-                                        <div class="col-12">
-                                            <p class="fw-bolder">Imagen:</p>
-                                            <div>
-                                                @if ($item->img_path != null)
-                                                <img src="{{ url('imagenes-productos/'.$item->img_path) }}" alt="{{$item->nombre}}" class="img-fluid img-thumbnail border border-4 rounded" 
-                                                     onerror="this.onerror=null; this.src=''; this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                                <div class="text-muted" style="display: none;">
-                                                    <i class="fas fa-image-slash"></i> No se pudo cargar la imagen
-                                                </div>
-                                                @else
-                                                <p class="text-muted"><i class="fas fa-box-open"></i> Sin imagen</p>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
+
 
                     <!-- Modal de confirmación-->
                     <div class="modal fade" id="confirmModal-{{$item->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -354,6 +319,8 @@
                             </div>
                         </div>
                     </div>
+                        </td>
+                    </tr>
                     @endforeach
                 </tbody>
             </table>
@@ -362,9 +329,101 @@
 
     </div>
 </div>
+
+<!-- Modal Genérico para Ver Detalles -->
+<div class="modal fade" id="modalVerProducto" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="modalVerTitulo">Detalles del producto</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <p><span class="fw-bolder">Descripción: </span><span id="modalVerDesc"></span></p>
+                    </div>
+                    <div class="col-12">
+                        <p><span class="fw-bolder">Fecha de vencimiento: </span><span id="modalVerVenc"></span></p>
+                    </div>
+                    <div class="col-12">
+                        <p><span class="fw-bolder">Stock: </span><span id="modalVerStock"></span></p>
+                    </div>
+                    <div class="col-12">
+                        <p class="fw-bolder">Imagen:</p>
+                        <div id="modalVerImgContainer">
+                            <img id="modalVerImg" src="" alt="" class="img-fluid img-thumbnail border border-4 rounded" style="display: none;">
+                            <div id="modalVerImgError" class="text-muted" style="display: none;">
+                                <i class="fas fa-image-slash"></i> No se pudo cargar la imagen
+                            </div>
+                            <div id="modalVerImgPlaceholder" class="text-muted" style="display: none;">
+                                <i class="fas fa-box-open"></i> Sin imagen
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('js')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" type="text/javascript"></script>
 <script src="{{ asset('js/datatables-simple-demo.js') }}"></script>
+<script>
+    $(document).ready(function() {
+        // Move modal to body to avoid z-index/clipping issues with the sidebar layout
+        $('#modalVerProducto').appendTo("body");
+
+        // Event delegation para botones en el datatable
+        $(document).on('click', '.btn-ver-producto', function() {
+            var nombre = $(this).data('nombre');
+            var desc = $(this).data('descripcion');
+            var venc = $(this).data('vencimiento');
+            var stock = $(this).data('stock');
+            var imgUrl = $(this).data('img');
+            
+            // Set Text
+            $('#modalVerTitulo').text('Detalles del producto: ' + nombre);
+            $('#modalVerDesc').text(desc);
+            $('#modalVerVenc').text(venc ? venc : 'No tiene');
+            $('#modalVerStock').text(stock);
+            
+            // Set Image
+            var img = $('#modalVerImg');
+            var imgError = $('#modalVerImgError');
+            var imgPlaceholder = $('#modalVerImgPlaceholder');
+            
+            img.hide();
+            imgError.hide();
+            imgPlaceholder.hide();
+            
+            if (imgUrl) {
+                img.attr('src', imgUrl);
+                img.show();
+                
+                // Reset error handler
+                img.off('error').on('error', function() {
+                    $(this).hide();
+                    imgError.show();
+                });
+            } else {
+                imgPlaceholder.show();
+            }
+            
+            // Show Modal - Reuse instance if exists
+            var modalEl = document.getElementById('modalVerProducto');
+            var myModal = bootstrap.Modal.getInstance(modalEl);
+            if (!myModal) {
+                myModal = new bootstrap.Modal(modalEl);
+            }
+            myModal.show();
+        });
+    });
+</script>
 @endpush

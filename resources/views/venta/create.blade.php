@@ -10,6 +10,18 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    .producto-card {
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        backface-visibility: hidden; /* Fix mostly for Chrome */
+    }
+    .producto-card:hover {
+        transform: translateY(-4px); /* Move up slightly instead of scaling */
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        background-color: #f8f9fa; /* Slight background highlight */
+    }
+</style>
 @endpush
 
 @section('content')
@@ -291,10 +303,7 @@
                             @foreach ($productos as $item)
                             <div class="col item-producto-modal">
                                 <div class="card h-100 shadow-sm border-0 producto-card btn-seleccionar-modal" 
-                                     style="cursor: pointer; transition: transform 0.2s;"
-                                     data-value="{{$item->id}}-{{$item->stock}}-{{$item->precio_venta}}-{{$item->impuesto}}"
-                                     onmouseover="this.style.transform='scale(1.03)'" 
-                                     onmouseout="this.style.transform='scale(1)'">
+                                     data-value="{{$item->id}}-{{$item->stock}}-{{$item->precio_venta}}-{{$item->impuesto}}">
                                     
                                     <div class="position-relative" style="padding-top: 100%; overflow: hidden;">
                                         @if($item->img_path)
