@@ -42,8 +42,18 @@ class ResetOperations extends Command
             DB::statement('SET CONSTRAINTS ALL DEFERRED');
 
             // 1. Limpiar detalles de ventas y compras primero (tablas hijas)
-            $this->cleanTable('detalle_ventas');
-            $this->cleanTable('detalle_compras');
+            // IMPORTANTE: Los nombres correctos según migraciones son producto_venta y compra_producto
+            if (Schema::hasTable('producto_venta')) {
+                $this->cleanTable('producto_venta');
+            } elseif (Schema::hasTable('detalle_ventas')) {
+                $this->cleanTable('detalle_ventas');
+            }
+
+            if (Schema::hasTable('compra_producto')) {
+                $this->cleanTable('compra_producto');
+            } elseif (Schema::hasTable('detalle_compras')) {
+                $this->cleanTable('detalle_compras');
+            }
             
             // 2. Limpiar tablas principales
             $this->cleanTable('ventas');
@@ -55,14 +65,18 @@ class ResetOperations extends Command
                 $this->cleanTable('devoluciones');
             }
             
-            // 4. Limpiar logs de actividad (opcional)
-            $this->cleanTable('activity_log');
+            // 4. Limpiar logs de actividad
+            // IMPORTANTE: El nombre correcto es activity_logs (plural)
+            if (Schema::hasTable('activity_logs')) {
+                $this->cleanTable('activity_logs');
+            } elseif (Schema::hasTable('activity_log')) {
+                $this->cleanTable('activity_log');
+            }
 
             // 5. Reiniciar secuencias (IDs a 1)
-            // En PostgreSQL se hace con RESTART IDENTITY o setval
-            $tables = ['ventas', 'compras', 'cajas', 'detalle_ventas', 'detalle_compras'];
+            $tables = ['ventas', 'compras', 'cajas', 'producto_venta', 'compra_producto'];
             if (Schema::hasTable('devoluciones')) $tables[] = 'devoluciones';
-            if (Schema::hasTable('activity_log')) $tables[] = 'activity_log';
+            if (Schema::hasTable('activity_logs')) $tables[] = 'activity_logs';
 
             foreach ($tables as $table) {
                 // Obtenemos el nombre de la secuencia (asumiendo convención estándar de Laravel/Postgres)
