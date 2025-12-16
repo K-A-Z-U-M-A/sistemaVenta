@@ -102,18 +102,18 @@
                         </button>
                         <ul class="dropdown-menu">
                             <li>
-                                <a href="{{ route('ventas.imprimir-ticket', $venta) }}" class="dropdown-item" target="_blank">
+                                <a href="#" onclick="imprimirTicket('{{ route('ventas.imprimir-ticket', $venta) }}'); return false;" class="dropdown-item">
                                     <i class="fa-solid fa-receipt"></i> Imprimir Todo
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a href="{{ route('ventas.imprimir-ticket', ['venta' => $venta, 'tipo' => 'comidas']) }}" class="dropdown-item" target="_blank">
+                                <a href="#" onclick="imprimirTicket('{{ route('ventas.imprimir-ticket', ['venta' => $venta, 'tipo' => 'comidas']) }}'); return false;" class="dropdown-item">
                                     <i class="fa-solid fa-utensils"></i> Solo Comidas
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('ventas.imprimir-ticket', ['venta' => $venta, 'tipo' => 'tragos']) }}" class="dropdown-item" target="_blank">
+                                <a href="#" onclick="imprimirTicket('{{ route('ventas.imprimir-ticket', ['venta' => $venta, 'tipo' => 'tragos']) }}'); return false;" class="dropdown-item">
                                     <i class="fa-solid fa-wine-glass"></i> Solo Tragos
                                 </a>
                             </li>
@@ -311,6 +311,13 @@
 
 @push('js')
 <script>
+    function imprimirTicket(url) {
+        var iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = url;
+        document.body.appendChild(iframe);
+    }
+
     //Variables
     let filasSubtotal = document.getElementsByClassName('td-subtotal');
     let cont = 0;

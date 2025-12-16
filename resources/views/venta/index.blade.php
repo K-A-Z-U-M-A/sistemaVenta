@@ -242,7 +242,7 @@
                     @endphp
                     <tr>
                         <td>
-                            <a href="{{ route('ventas.imprimir-ticket', $item) }}" class="btn btn-sm btn-primary" target="_blank" title="Imprimir Ticket">
+                            <a href="#" onclick="imprimirTicket('{{ route('ventas.imprimir-ticket', $item) }}'); return false;" class="btn btn-sm btn-primary" title="Imprimir Ticket">
                                 <i class="fa-solid fa-print"></i> Imprimir
                             </a>
                         </td>
@@ -367,6 +367,13 @@
 @push('js')
 <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" type="text/javascript"></script>
 <script>
+    function imprimirTicket(url) {
+        var iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = url;
+        document.body.appendChild(iframe);
+    }
+
     // Simple-DataTables
     // https://github.com/fiduswriter/Simple-DataTables/wiki
     window.addEventListener('DOMContentLoaded', event => {

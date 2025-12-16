@@ -29,7 +29,35 @@ class LoginController extends Controller
         $user = User::where('email', $credentials['email'])->first();
 
         // Verificar si el usuario ya tiene una sesión activa
+        $isSessionActive = false;
+        
         if ($user && $user->session_id) {
+            // Verificar si la sesión está realmente activa (actividad reciente < 2 min)
+            // Esto evita bloquear al usuario si solo cerró el navegador sin hacer logout
+            
+            $driver = config('session.driver');
+            
+            if ($driver === 'file') {
+                $sessionPath = config('session.files') . '/' . $user->session_id;
+                if (file_exists($sessionPath)) {
+                    // Si el archivo existe y se modificó hace menos de 120 segundos
+                    if ((time() - filemtime($sessionPath)) < 120) {
+                        $isSessionActive = true;
+                    }
+                }
+            } elseif ($driver === 'database') {
+                $table = config('session.table');
+                // Need to import DB facade if not already imported
+                // use Illuminate\Support\Facades\DB;
+                $session = \Illuminate\Support\Facades\DB::table($table)->where('id', $user->session_id)->first();
+                if ($session && (time() - $session->last_activity < 120)) {
+                    $isSessionActive = true;
+                }
+            }
+            // Si usas otro driver (redis, etc), asume false o implementa lógica específica
+        }
+
+        if ($isSessionActive) {
             // Verificar si se está forzando el cierre de la sesión anterior
             if (!$request->has('force_login')) {
                 // Guardar credenciales temporalmente en sesión (se eliminarán después)
@@ -39,9 +67,9 @@ class LoginController extends Controller
                     'timestamp' => now()->timestamp
                 ]);
                 
-                // Hay una sesión activa, pedir confirmación
+                // Hay una sesión activa RECIENTE, pedir confirmación
                 return redirect()->to('login')
-                    ->with('warning', 'Ya existe una sesión activa con esta cuenta en otro dispositivo/navegador.')
+                    ->with('warning', 'Se detectó actividad reciente en otra sesión con esta cuenta.')
                     ->with('show_force_login', true);
             }
             
@@ -61,7 +89,7 @@ class LoginController extends Controller
                 $request->session()->forget('temp_credentials');
             }
             
-            // Limpiar la sesión anterior
+            // Limpiar la sesión anterior (solo referencia en DB)
             $user->session_id = null;
             $user->save();
         }

@@ -32,8 +32,20 @@ class TicketPrinterService
         }
 
         try {
-            // Conectar a la impresora
-            $connector = new \Mike42\Escpos\PrintConnectors\WindowsPrintConnector($this->printerName);
+            // Determinar el tipo de conector basado en el nombre
+            $connector = null;
+            if (preg_match('/^COM\d+$/i', $this->printerName) || preg_match('/^LPT\d+$/i', $this->printerName)) {
+                // Puerto Serial/Paralelo (común en Bluetooth/USB sin driver de spooler)
+                if (!class_exists('Mike42\Escpos\PrintConnectors\FilePrintConnector')) {
+                   // Fallback seguro si no está la clase, aunque debería estar en el paquete
+                   throw new \Exception("FilePrintConnector no disponible para puertos COM/LPT");
+                }
+                $connector = new \Mike42\Escpos\PrintConnectors\FilePrintConnector($this->printerName);
+            } else {
+                // Impresora compartida de Windows (SMB/Spooler)
+                $connector = new \Mike42\Escpos\PrintConnectors\WindowsPrintConnector($this->printerName);
+            }
+
             $printer = new \Mike42\Escpos\Printer($connector);
 
             // Encabezado
@@ -165,7 +177,14 @@ class TicketPrinterService
         }
 
         try {
-            $connector = new \Mike42\Escpos\PrintConnectors\WindowsPrintConnector($this->printerName);
+            // Determinar el tipo de conector basado en el nombre
+            $connector = null;
+            if (preg_match('/^COM\d+$/i', $this->printerName) || preg_match('/^LPT\d+$/i', $this->printerName)) {
+                $connector = new \Mike42\Escpos\PrintConnectors\FilePrintConnector($this->printerName);
+            } else {
+                $connector = new \Mike42\Escpos\PrintConnectors\WindowsPrintConnector($this->printerName);
+            }
+            
             $printer = new \Mike42\Escpos\Printer($connector);
 
             // Encabezado

@@ -12,10 +12,11 @@
         }
         body {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 11px;
+            font-size: 12px; /* Increased from 10px */
+            font-weight: bold; /* Make everything bold */
             margin: 0;
-            padding: 5px;
-            width: 80mm;
+            padding: 2px;
+            width: 56mm;
             background-color: #fff;
         }
         .ticket {
@@ -25,82 +26,91 @@
             text-align: center;
             margin-bottom: 8px;
             padding-bottom: 8px;
-            border-bottom: 1px dashed #000;
+            border-bottom: 2px dashed #000; /* Thicker border */
         }
         .header h2 {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 3px;
+            font-size: 20px; /* Increased from 16px */
+            font-weight: 900; /* Extra bold */
+            margin-bottom: 5px;
         }
         .header p {
-            font-size: 10px;
+            font-size: 12px; /* Increased from 10px */
             margin: 2px 0;
+            font-weight: bold;
         }
         .info-section {
             margin-bottom: 8px;
             padding-bottom: 8px;
-            border-bottom: 1px dashed #000;
+            border-bottom: 2px dashed #000;
         }
         .info-row {
             display: flex;
             justify-content: space-between;
-            margin: 3px 0;
-            font-size: 11px;
+            margin: 4px 0;
+            font-size: 12px; /* Increased from 11px */
+            font-weight: bold;
         }
         .info-label {
-            font-weight: bold;
+            font-weight: 900; /* Extra bold */
         }
         .products-table {
             width: 100%;
             margin-bottom: 8px;
-            border-bottom: 1px dashed #000;
+            border-bottom: 2px dashed #000;
             padding-bottom: 8px;
         }
         .product-header {
             display: flex;
             justify-content: space-between;
-            font-weight: bold;
+            font-weight: 900;
             margin-bottom: 5px;
-            font-size: 10px;
+            font-size: 12px; /* Increased from 10px */
+            text-transform: uppercase;
         }
         .product-row {
-            margin-bottom: 5px;
+            margin-bottom: 6px;
+            border-bottom: 1px dotted #000;
+            padding-bottom: 2px;
         }
         .product-name {
-            font-size: 11px;
-            font-weight: bold;
+            font-size: 14px; /* Increased from 11px */
+            font-weight: 900; /* Extra bold */
             margin-bottom: 2px;
         }
         .product-details {
             display: flex;
             justify-content: space-between;
-            font-size: 10px;
-            color: #333;
+            font-size: 12px; /* Increased from 10px */
+            color: #000; /* Ensure black */
+            font-weight: bold;
         }
         .totals {
             margin-bottom: 8px;
             padding-bottom: 8px;
-            border-bottom: 1px dashed #000;
+            border-bottom: 2px dashed #000;
         }
         .total-row {
             display: flex;
             justify-content: space-between;
-            margin: 3px 0;
+            margin: 4px 0;
+            font-weight: bold;
         }
         .total-row.main {
-            font-size: 14px;
-            font-weight: bold;
+            font-size: 18px; /* Increased from 14px */
+            font-weight: 900;
             margin-top: 5px;
         }
         .footer {
             text-align: center;
-            font-size: 10px;
+            font-size: 12px; /* Increased from 10px */
+            font-weight: bold;
             margin-top: 8px;
         }
         @media print {
             body {
                 margin: 0;
                 padding: 5px;
+                -webkit-print-color-adjust: exact;
             }
         }
     </style>
